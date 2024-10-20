@@ -159,7 +159,6 @@ class TransmissionController extends Controller
 
     public function transferFromThePaymentGateway(TransmissionRequest $request)
     {
-        dd($request->all());
         try {
             $balance = Auth::user()->getCreaditBalance();
 
