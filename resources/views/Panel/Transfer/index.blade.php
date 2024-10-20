@@ -20,7 +20,7 @@
                         </h1>
 
                         @if(!$errors->any())
-                            <h1>قیمت به ریال : <span class="text-green-700">{{$inputs['rial']}}</span></h1>
+                            <h1>قیمت به تومان : <span class="text-green-700">{{$inputs['rial']}}</span></h1>
                         @endif
 
                         <h1>آدرس حساب مقصد : <span
