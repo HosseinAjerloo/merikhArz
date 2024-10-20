@@ -22,7 +22,7 @@ class TransmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'Accepting_the_rules'=>"in:on|required",
+            'Accepting_the_rules'=>"sometimes|in:on|required",
             "service_id"=>"sometimes|exists:services,id",
             "custom_payment"=>[(request()->has('service_id')==false?'required':'nullable'),'sometimes','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
             "transmission"=>"required|max:9|min:9"

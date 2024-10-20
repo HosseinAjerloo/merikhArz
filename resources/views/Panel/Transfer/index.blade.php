@@ -39,14 +39,14 @@
                         شما درحال انجام حواله با اطلاعات فوق هستید جهت ادامه بر روی دکمه زیر کلیک کنید.
                     </p>
                     @if(!$errors->any())
-                        <form action="">
-                            <input type="hidden" name="transmission">
-                            <input type="hidden" name="custom_payment">
+                        <form action="{{route('panel.transferFromThePaymentGateway')}}" method="post">
+                            @csrf
+                            <input type="hidden" name="transmission" value="{{$inputs['account']}}">
+                            <input type="hidden" name="custom_payment" value="{{$inputs['amount']}}">
                             <button class="px-2 py-1.5 bg-sky-600 text-white p-4 rounded-md text-center w-full">ادامه
                             </button>
                         </form>
                     @else
-
                         <button class="px-2 py-1.5 bg-rose-600 text-white p-4 rounded-md text-center w-full">ابتدا
                             خطاهای موجود را رفع کنید و سپس اقدام فرمایید
                         </button>
@@ -58,21 +58,3 @@
     </div>
 @endsection
 
-@section('script-tag')
-    <script>
-        $(document).ready(function () {
-            let toast = $('.toast');
-            setTimeout(function () {
-                $(toast).addClass('-translate-y-7');
-                $(toast).remove();
-            }, 9000)
-
-
-            let closeToast = $('.close-toast');
-            $(closeToast).click(function () {
-                $(toast).addClass('invisible');
-                $(toast).remove();
-            });
-        })
-    </script>
-@endsection
