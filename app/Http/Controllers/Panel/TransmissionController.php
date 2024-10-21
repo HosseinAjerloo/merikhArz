@@ -444,7 +444,7 @@ class TransmissionController extends Controller
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
                 $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
             } else {
-                return redirect()->back()->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
+                return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
 
             $inputs['final_amount'] = $voucherPrice;
@@ -487,7 +487,7 @@ class TransmissionController extends Controller
                 $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال کارت هدیه پرفکت مانی  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
-                return redirect()->back()->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
             $url = $objBank->getBankUrl();
             $token = $status;
@@ -510,7 +510,7 @@ class TransmissionController extends Controller
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
 
-            return redirect()->back()->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+            return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
 
