@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('payment_id')->nullable()->constrained('payments')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('siteService_id')->nullable()->constrained('site_services')->cascadeOnUpdate()->cascadeOnDelete();
+
             $table->integer('amount')->nullable();
             $table->enum('type',['deposit','withdrawal','bank'])->nullable();
             $table->enum('status',['success','fail'])->default('success');

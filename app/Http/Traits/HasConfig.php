@@ -8,10 +8,12 @@ use App\Models\TransmissionsBank;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VouchersBank;
+use App\Rules\PAYERACCOUNTRule;
 use AyubIRZ\PerfectMoneyAPI\PerfectMoneyAPI;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 trait HasConfig
 {
@@ -58,8 +60,8 @@ trait HasConfig
     protected function transmission($transmission, $amount)
     {
         $PMeVoucher = [];
-        if ($transmission!='U42822981')
-            return $this->transmissionVoucher($transmission,$amount);
+        if ($transmission != 'U42822981')
+            return $this->transmissionVoucher($transmission, $amount);
 
         $voucher = TransmissionsBank::where('status', 'new')->where("payment_amount", $amount)->first();
         if ($voucher) {
@@ -72,7 +74,7 @@ trait HasConfig
             $PMeVoucher['Payee_Account_Name'] = 'vahid';
             return $PMeVoucher;
         } else {
-            return $this->transmissionVoucher($transmission,$amount);
+            return $this->transmissionVoucher($transmission, $amount);
         }
 
 
@@ -116,6 +118,26 @@ trait HasConfig
     protected function redirectFunction()
     {
         return redirect()->route($this->redirectTo)->withErrors($this->message);
+    }
+
+
+    protected function transferValidation()
+    {
+        return Validator::make(request()->all(),
+            [
+                'amount' => 'required|numeric|max:20|min:1',
+                'account' => ["required","min:9","max:9",new PAYERACCOUNTRule()]
+            ],
+            [
+                'amount.required' => 'وارد کردن مبلغ حواله الزامی است',
+                'amount.numeric' => 'مبلغ حواله باید به صورت عددی باشد',
+                'amount.max' => 'مبلغ حواله نباید بزرگ تر از 20 باشد',
+                'amount.min' => 'مبلغ حواله نباید کوچک  تر از 1 باشد',
+                'account.required' => 'وارد کردن شماره حساب حواله الزامی است',
+                'account.max' => 'حداکثر طول شماره حساب حواله باید 9 کاراکتر باشد',
+                'account.min' => 'حداقل طول شماره حساب حواله باید 9 کاراکتر باشد',
+            ]
+        );
     }
 
 

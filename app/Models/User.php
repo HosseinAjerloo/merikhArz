@@ -24,7 +24,7 @@ class User extends Authenticatable
         [
             'name' => "حسین",
             'family' => "آجرلو",
-            'mobile' => "09386542718",
+            'mobile' => "09186414452",
         ];
     protected $fillable = [
         'name',

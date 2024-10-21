@@ -5,7 +5,7 @@ namespace App\Http\Requests\Panel\Transmission;
 use App\Rules\PAYERACCOUNTRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class TransmissionRequest extends FormRequest
+class TransferRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,16 +23,17 @@ class TransmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'Accepting_the_rules'=>"in:on|required",
-            "service_id"=>"sometimes|exists:services,id",
-            "custom_payment"=>[(request()->has('service_id')==false?'required':'nullable'),'sometimes','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
-            "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()]
+            "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
+            "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()],
+            'siteService_id'=>'required|exists:site_services,id'
         ];
     }
     public function messages(): array
     {
         return [
-            'custom_payment.required'=>'در صورت انتخاب نکردن خرید سریع ووچر انتخاب مبلغ دلخواه الزامی است'
+            'custom_payment.required'=>'وارد کردن مبلغ کارت هدیه پرفکت مانی الزامی است',
+            'siteService.required'=>'پذیرنده نامعتبر است',
+            'siteService.exists'=>'پذیرنده نامعتبر است',
         ];
     }
 }
