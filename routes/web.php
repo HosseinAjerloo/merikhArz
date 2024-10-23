@@ -118,6 +118,9 @@ Route::prefix('admin')->middleware(['auth', 'AdminLogin'])->group(function () {
 Route::fallback(function () {
     abort(404);
 });
+//Route::get('test',function (){
+//   dd('test');
+//});
 
 
 

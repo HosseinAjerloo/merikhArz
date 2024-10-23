@@ -401,8 +401,7 @@ class TransmissionController extends Controller
     public function transfer(Request $request)
     {
         try {
-//            SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();
-            $siteService = SiteService::find(1);
+            $siteService = SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();;
             if ($siteService) {
                 $request->request->add(['amount' => $request->get('amount')]);
                 $request->request->add(['account' => $request->get('account')]);
