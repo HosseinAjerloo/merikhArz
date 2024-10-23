@@ -403,23 +403,19 @@ class TransmissionController extends Controller
         try {
 //            SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();
             $siteService = SiteService::find(1);
-            if ($siteService) {
-                $request->request->add(['amount' => $request->get('amount')]);
-                $request->request->add(['account' => $request->get('account')]);
-                $request->merge(['siteService_id' => $siteService->id]);
-                $validation = $this->transferValidation();
-                $inputs = $request->all();
-                if (!$validation->fails()) {
-                    session()->put('transfer', $request->getUri());
-                    $dollar = Doller::orderBy('id', 'desc')->first();
-                    $inputs['rial'] = $dollar->DollarRateWithAddedValue() * $inputs['amount'];
-                    $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
-                    return view('Panel.Transfer.index', compact('inputs'));
-                }
-
-                return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
+            $request->request->add(['amount' => $request->get('amount')]);
+            $request->request->add(['account' => $request->get('account')]);
+            $validation = $this->transferValidation();
+            $inputs = $request->all();
+            if (!$validation->fails()) {
+                session()->put('transfer', $request->getUri());
+                $dollar = Doller::orderBy('id', 'desc')->first();
+                $inputs['rial'] = $dollar->DollarRateWithAddedValue() * $inputs['amount'];
+                $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
+                return view('Panel.Transfer.index', compact('inputs'));
             }
-            return redirect()->route('panel.index')->withErrors(['notExistTransfer' => 'شما دسترسی به این قسمت سایت ندارین لطفا با پشتیبانی هماهنگ شوید']);
+            return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
+
         } catch (\Exception $e) {
             return redirect()->route('panel.index')->withErrors(['Error' => 'خطایی رخ داد لطفا از طریق پشتیبانی تیکت ثبت کنید']);
 
@@ -444,7 +440,7 @@ class TransmissionController extends Controller
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
                 $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
             } else {
-                return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
+                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
 
             $inputs['final_amount'] = $voucherPrice;
@@ -481,13 +477,12 @@ class TransmissionController extends Controller
                 "creadit_balance" => $balance,
                 'description' => " ارتباط با بانک $bank->name",
                 'payment_id' => $payment->id,
-                'siteService_id' => $inputs['siteService_id']
             ]);
             if (!$status) {
                 $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال کارت هدیه پرفکت مانی  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
-                return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
             $url = $objBank->getBankUrl();
             $token = $status;
@@ -510,7 +505,7 @@ class TransmissionController extends Controller
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
 
-            return redirect()->route('panel.transfer.external',['account'=>$inputs['transmission'],'amount'=>$inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+            return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
 
@@ -606,7 +601,6 @@ class TransmissionController extends Controller
                     'description' => 'انتقال ووچر و برداشت مبلغ از کیف پول',
                     'payment_id' => $payment->id,
                     'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
-                    'siteService_id'=>$financeTransaction->siteService_id
                 ]);
 
                 $transitionDelivery = Transmission::create(

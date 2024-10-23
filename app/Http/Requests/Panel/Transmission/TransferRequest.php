@@ -25,7 +25,6 @@ class TransferRequest extends FormRequest
         return [
             "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
             "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()],
-            'siteService_id'=>'required|exists:site_services,id'
         ];
     }
     public function messages(): array

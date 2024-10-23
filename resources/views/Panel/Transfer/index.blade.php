@@ -43,7 +43,6 @@
                             @csrf
                             <input type="hidden" name="transmission" value="{{$inputs['account']}}">
                             <input type="hidden" name="custom_payment" value="{{$inputs['amount']}}">
-                            <input type="hidden" name="siteService_id" value="{{$inputs['siteService_id']}}">
                             <button class="px-2 py-1.5 bg-sky-600 text-white p-4 rounded-md text-center w-full">ادامه
                             </button>
                         </form>
