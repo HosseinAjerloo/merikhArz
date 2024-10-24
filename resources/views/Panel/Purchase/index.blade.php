@@ -4,7 +4,7 @@
     <div class="flex items-center justify-center flex-col space-y-3">
         <p class="text-center text-sm py-2 sm:text-base text-rose-600 font-bold">
 {{--            مبلغ ووچر پرفکت مانی درخواستی را وارد کنید یا از انتخاب سریع استفاده نمائید.--}}
-        درحال بروز رسانی هستیم به زود برمیگردیم
+            درحال بروز رسانی هستیم تا ساعت اینده درکنار شما هستیم
         </p>
         <div class="space-x-3 space-x-reverse">
             <input type="text"
