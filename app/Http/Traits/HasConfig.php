@@ -60,7 +60,7 @@ trait HasConfig
     protected function transmission($transmission, $amount)
     {
         $PMeVoucher = [];
-        if ($transmission != env('PAYER_ACCOUNT'))
+        if ($transmission != env('DESTINATION_REMITTANCE'))
             return $this->transmissionVoucher($transmission, $amount);
 
         $voucher = TransmissionsBank::where('status', 'new')->where("payment_amount", $amount)->first();
@@ -70,7 +70,7 @@ trait HasConfig
             $PMeVoucher['PAYMENT_AMOUNT'] = $voucher->payment_amount;
             $PMeVoucher['PAYMENT_BATCH_NUM'] = $voucher->payment_batch_num;
             $PMeVoucher['Payer_Account'] = env('PAYER_ACCOUNT');
-            $PMeVoucher['Payee_Account'] = env('PAYER_ACCOUNT');
+            $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE');
             $PMeVoucher['Payee_Account_Name'] = 'vahid';
             return $PMeVoucher;
         } else {
