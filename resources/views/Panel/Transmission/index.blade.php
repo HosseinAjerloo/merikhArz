@@ -181,7 +181,19 @@
 
                         if (payment <= Number("{{env('Daily_Purchase_Limit')}}")) {
                             let paymentResult = payment * dollar
-                            if (payment.match(/^\d+$/)) {
+                            if (payment.match(/(([0-9])?((\.)?)([0-9]{1,2}))/gm)) {
+                                if(payment.includes('.'))
+                                {
+                                    let paymentSplit=payment.split('.')[1]
+                                    if(paymentSplit.length>1)
+                                    {
+                                        $("#" + callElementTarget).val('')
+                                        $(payment_text).text('')
+                                        $(customPayment).val('')
+                                        return;
+                                    }
+                                }
+
                                 $("#" + callElementTarget).val(payment)
                                 $(payment_text).text(' مبلغ قابل پرداخت: ' + formatNumber(paymentResult) + ' ریال ')
 
@@ -206,16 +218,26 @@
                     })
                     let payment = $(customPayment).val();
                     if (payment <= Number("{{env('Daily_Purchase_Limit')}}")) {
-                        if (payment.match(/^\d+$/)) {
                             let paymentResult = payment * dollar
+                        if (payment.match(/(([0-9])?((\.)?)([0-9]{1,2}))/gm)) {
+                            if(payment.includes('.'))
+                            {
+                               let paymentSplit=payment.split('.')[1]
+                                if(paymentSplit.length>1)
+                                {
+                                    $("#" + callElementTarget).val('')
+                                    $(payment_text).text('')
+                                    $(customPayment).val('')
+                                    return;
+                                }
+                            }
+
                             $("#" + callElementTarget).val(payment)
                             $(payment_text).text(' مبلغ قابل پرداخت: ' + formatNumber(paymentResult) + ' ریال ')
 
                         } else {
                             $("#" + callElementTarget).val('')
                             $(payment_text).text('')
-                            $(customPayment).val('');
-
                         }
                     } else {
                         $(customPayment).val('')
@@ -257,6 +279,7 @@
 
 
         function formatNumber(number) {
+            number=Math.floor(number)
             let string = number.toLocaleString('fa-IR'); // ۱۲٬۳۴۵٫۶۷۹
             number = string.replace(/\٬/g, ",‬");
             return number;

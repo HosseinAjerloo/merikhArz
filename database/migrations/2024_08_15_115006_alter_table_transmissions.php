@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('transmissions', function (Blueprint $table) {
             $table->foreignId('invoice_id')->nullable()->constrained('invoices')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->enum('type',['perfectmoney','sainaex'])->default('perfectmoney')->nullable();
 
         });
     }

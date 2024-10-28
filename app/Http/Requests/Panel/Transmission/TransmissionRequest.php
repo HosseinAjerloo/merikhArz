@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\Transmission;
 
+use App\Rules\Panel\Transmission\DecimalRule;
 use App\Rules\PAYERACCOUNTRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,7 +26,7 @@ class TransmissionRequest extends FormRequest
         return [
             'Accepting_the_rules'=>"in:on|required",
             "service_id"=>"sometimes|exists:services,id",
-            "custom_payment"=>[(request()->has('service_id')==false?'required':'nullable'),'sometimes','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
+            "custom_payment"=>[(request()->has('service_id')==false?'required':'nullable'),'sometimes','numeric',"max:".env('Daily_Purchase_Limit'),'min:0.1',new DecimalRule()],
             "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()]
         ];
     }

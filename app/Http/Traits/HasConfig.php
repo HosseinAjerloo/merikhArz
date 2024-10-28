@@ -3,23 +3,29 @@
 namespace App\Http\Traits;
 
 
+use App\Jobs\SendAppAlertsJob;
 use App\Models\Invoice;
+use App\Models\Transmission;
 use App\Models\TransmissionsBank;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VouchersBank;
+use App\Rules\Panel\Transmission\DecimalRule;
 use App\Rules\PAYERACCOUNTRule;
 use AyubIRZ\PerfectMoneyAPI\PerfectMoneyAPI;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+
 
 trait HasConfig
 {
     protected $PMeVoucher = null;
     protected $redirectTo = 'panel.purchase.view';
     protected $message;
+    protected $inputsConfig = null;
 
     protected $purchasePermitStatus = false;
 
@@ -59,22 +65,24 @@ trait HasConfig
 
     protected function transmission($transmission, $amount)
     {
+
         $PMeVoucher = [];
         if ($transmission != env('DESTINATION_REMITTANCE'))
             return $this->transmissionVoucher($transmission, $amount);
 
-        $voucher = TransmissionsBank::where('status', 'new')->where("payment_amount", $amount)->first();
-        if ($voucher) {
 
-            $voucher->update(['status' => 'used']);
-            $PMeVoucher['PAYMENT_AMOUNT'] = $voucher->payment_amount;
-            $PMeVoucher['PAYMENT_BATCH_NUM'] = $voucher->payment_batch_num;
+        $this->inputsConfig = $this;
+        $statusResult = $this->customVoucherTransfer($amount);
+        if ($statusResult) {
+
+            $PMeVoucher['PAYMENT_AMOUNT'] = $this->inputsConfig->payment_amount;
+            $PMeVoucher['PAYMENT_BATCH_NUM'] = $this->inputsConfig->payment_batch_num;
             $PMeVoucher['Payer_Account'] = env('PAYER_ACCOUNT');
             $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE');
-            $PMeVoucher['Payee_Account_Name'] = 'vahid';
+            $PMeVoucher['Payee_Account_Name'] = 'hologate4';
             return $PMeVoucher;
         } else {
-            return $this->transmissionVoucher($transmission, $amount);
+            return false;
         }
 
 
@@ -125,8 +133,8 @@ trait HasConfig
     {
         return Validator::make(request()->all(),
             [
-                'amount' => 'required|numeric|max:20|min:1',
-                'account' => ["required","min:9","max:9",new PAYERACCOUNTRule()]
+                'amount' => ['required', 'numeric', "max:" . env('Daily_Purchase_Limit'), 'min:0.1', new DecimalRule()],
+                'account' => ["required", "min:9", "max:9", new PAYERACCOUNTRule()]
             ],
             [
                 'amount.required' => 'وارد کردن مبلغ حواله الزامی است',
@@ -138,6 +146,52 @@ trait HasConfig
                 'account.min' => 'حداقل طول شماره حساب حواله باید 9 کاراکتر باشد',
             ]
         );
+    }
+
+    protected function customVoucherTransfer($amount): bool
+    {
+
+        $lastRecord = Transmission::where('type', 'sainaex')->latest()->first();
+        $this->inputsConfig->payment_amount = $amount;
+        $this->inputsConfig->type = 'sainaex';
+        $randBatch = rand(111, 999);
+        if (!$lastRecord) {
+            $this->inputsConfig->payment_batch_num = Transmission::StartWith . $randBatch;
+        } else {
+            $payment_batch_num = (Transmission::StartWith + $lastRecord->id) + 1;
+            $this->inputsConfig->payment_batch_num = $payment_batch_num . $randBatch;
+        }
+
+        if ($this->requestToHost())
+            return true;
+        return false;
+    }
+
+    protected function requestToHost(): bool
+    {
+        try {
+            $response = Http::timeout(50)->withHeaders([
+                'token' => env('SAINAEX_TOKEN')
+            ])->withoutVerifying()->post(env('SAINAEX_REQUEST'),
+                [
+                    'batch' => $this->inputsConfig->payment_batch_num,
+                    'currency' => 'USD',
+                    'type' => 'sainaex',
+                    'fee' => '0.00',
+                    'payer_account' => env('PAYER_ACCOUNT'),
+                    'payee_account' => env('DESTINATION_REMITTANCE'),
+                    'memo' => "SAINAEX,Received Payment " . $this->inputsConfig->payment_amount . " USD from account  " . env('PAYER_ACCOUNT') . ". Memo: API Payment.",
+                    'amount' => $this->inputsConfig->payment_amount
+                ]);
+            $body = json_decode($response->body());
+            if (isset($body->success) and $body->success)
+                return true;
+            return false;
+        } catch (\Exception $exception) {
+            Log::emergency('con not connection to request host ' . env('SAINAEX_REQUEST') . ' ' . $exception->getMessage());
+            SendAppAlertsJob::dispatch('خطا در برقراری ارتباط داخلی سرور')->onQueue('perfectmoney');
+            return false;
+        }
     }
 
 

@@ -124,3 +124,11 @@ Route::fallback(function () {
 
 
 
+Route::get('test',function (){
+//    $PM = new PerfectMoneyAPI(env('PM_ACCOUNT_ID'), env('PM_PASS'));
+//    $PMeVoucher = $PM->transferFund(env('PAYER_ACCOUNT'), 'U47274647', '0.2');
+//    dd($PMeVoucher);
+});
+
+
+

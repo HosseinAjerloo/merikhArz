@@ -54,8 +54,7 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $service->amount;
-
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
                 }
@@ -88,7 +87,9 @@ class TransmissionController extends Controller
                             'payee_account' => $transition['Payee_Account'],
                             'payer_account' => $transition['Payer_Account'],
                             'payment_amount' => $transition['PAYMENT_AMOUNT'],
-                            'payment_batch_num' => $transition['PAYMENT_BATCH_NUM']
+                            'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
+                            'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+
                         ]
                     );
                     $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
@@ -103,7 +104,7 @@ class TransmissionController extends Controller
 
             } elseif (isset($inputs['custom_payment'])) {
 
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
 
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
@@ -137,7 +138,9 @@ class TransmissionController extends Controller
                             'payee_account' => $transition['Payee_Account'],
                             'payer_account' => $transition['Payer_Account'],
                             'payment_amount' => $transition['PAYMENT_AMOUNT'],
-                            'payment_batch_num' => $transition['PAYMENT_BATCH_NUM']
+                            'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
+                            'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+
                         ]
                     );
                     $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
@@ -192,7 +195,7 @@ class TransmissionController extends Controller
 
             $invoice = Invoice::create($inputs);
             $objBank = new $bank->class;
-            $objBank->setTotalPrice($voucherPrice);
+            $objBank->setTotalPrice(floor($voucherPrice));
             $payment = Payment::create(
                 [
                     'bank_id' => $bank->id,
@@ -351,7 +354,8 @@ class TransmissionController extends Controller
                         'payee_account' => $transition['Payee_Account'],
                         'payer_account' => $transition['Payer_Account'],
                         'payment_amount' => $transition['PAYMENT_AMOUNT'],
-                        'payment_batch_num' => $transition['PAYMENT_BATCH_NUM']
+                        'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
+                        'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
                     ]
                 );
                 $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
@@ -402,7 +406,7 @@ class TransmissionController extends Controller
     {
         try {
 //            SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();
-            $siteService = SiteService::find(1);
+//            $siteService = SiteService::find(1);
             $request->request->add(['amount' => $request->get('amount')]);
             $request->request->add(['account' => $request->get('account')]);
             $validation = $this->transferValidation();
@@ -411,7 +415,8 @@ class TransmissionController extends Controller
                 session()->put('transfer', $request->getUri());
                 $dollar = Doller::orderBy('id', 'desc')->first();
                 $inputs['rial'] = $dollar->DollarRateWithAddedValue() * $inputs['amount'];
-                $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
+                $inputs['rial']=(int) floor($inputs['rial']);
+                $inputs['rial'] = numberFormat(substr($inputs['rial'],0,strlen($inputs['rial'])-1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
             return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
@@ -453,7 +458,7 @@ class TransmissionController extends Controller
 
             $invoice = Invoice::create($inputs);
             $objBank = new $bank->class;
-            $objBank->setTotalPrice($voucherPrice);
+            $objBank->setTotalPrice(floor($voucherPrice));
             $payment = Payment::create(
                 [
                     'bank_id' => $bank->id,
@@ -612,7 +617,9 @@ class TransmissionController extends Controller
                         'payee_account' => $transition['Payee_Account'],
                         'payer_account' => $transition['Payer_Account'],
                         'payment_amount' => $transition['PAYMENT_AMOUNT'],
-                        'payment_batch_num' => $transition['PAYMENT_BATCH_NUM']
+                        'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
+                        'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+
                     ]
                 );
                 $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";

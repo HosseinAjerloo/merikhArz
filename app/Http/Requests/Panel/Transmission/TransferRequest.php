@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Panel\Transmission;
 
+use App\Rules\Panel\Transmission\DecimalRule;
 use App\Rules\PAYERACCOUNTRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +24,8 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:1'],
+            "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:0.1',new DecimalRule()],
+
             "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()],
         ];
     }

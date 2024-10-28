@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('payment_amount')->nullable();
             $table->string('payment_batch_num')->nullable();
             $table->enum('status',['used','new'])->default('new')->nullable();
+            $table->enum('type',['perfectmoney','sainaex'])->default('perfectmoney')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
