@@ -158,7 +158,7 @@ trait HasConfig
         if (!$lastRecord) {
             $this->inputsConfig->payment_batch_num = Transmission::StartWith . $randBatch;
         } else {
-            $payment_batch_num = (Transmission::StartWith + $lastRecord->id) + 1;
+            $payment_batch_num = (Transmission::StartWith + Transmission::latest()->first()->id) + 1;
             $this->inputsConfig->payment_batch_num = $payment_batch_num . $randBatch;
         }
 
