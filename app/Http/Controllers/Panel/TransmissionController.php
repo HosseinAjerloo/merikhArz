@@ -30,7 +30,12 @@ use function Termwind\ask;
 class TransmissionController extends Controller
 {
     use HasConfig;
-
+    protected $inputsConfig;
+    public function __construct()
+    {
+        $this->inputsConfig = $this;
+        $this->inputsConfig->type='perfectmoney';
+    }
 
     public function index()
     {
@@ -88,7 +93,7 @@ class TransmissionController extends Controller
                             'payer_account' => $transition['Payer_Account'],
                             'payment_amount' => $transition['PAYMENT_AMOUNT'],
                             'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
-                            'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+                            'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
 
                         ]
                     );
@@ -139,7 +144,7 @@ class TransmissionController extends Controller
                             'payer_account' => $transition['Payer_Account'],
                             'payment_amount' => $transition['PAYMENT_AMOUNT'],
                             'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
-                            'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+                            'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
 
                         ]
                     );
@@ -157,6 +162,7 @@ class TransmissionController extends Controller
         } catch
         (\Exception $exception) {
             SendAppAlertsJob::dispatch('در انتقال وچچر از طریف کیف پول خطایی رخ داد سرویس پرفکت مانی و سایر موارد چک شود')->onQueue('perfectmoney');
+            Log::emergency(PHP_EOL . $exception->getMessage() . PHP_EOL);
 
             return redirect()->route('panel.transmission.view')->withErrors(['error' => "عملیات انتقال ووچر ناموفق بود در صورت کسر موجودی از کیف پول شما با پشتیبانی تماس حاصل فرمایید."]);
         }
@@ -355,7 +361,7 @@ class TransmissionController extends Controller
                         'payer_account' => $transition['Payer_Account'],
                         'payment_amount' => $transition['PAYMENT_AMOUNT'],
                         'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
-                        'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+                        'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
                     ]
                 );
                 $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
@@ -415,8 +421,8 @@ class TransmissionController extends Controller
                 session()->put('transfer', $request->getUri());
                 $dollar = Doller::orderBy('id', 'desc')->first();
                 $inputs['rial'] = $dollar->DollarRateWithAddedValue() * $inputs['amount'];
-                $inputs['rial']=(int) floor($inputs['rial']);
-                $inputs['rial'] = numberFormat(substr($inputs['rial'],0,strlen($inputs['rial'])-1));
+                $inputs['rial'] = (int)floor($inputs['rial']);
+                $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
             return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
@@ -618,7 +624,7 @@ class TransmissionController extends Controller
                         'payer_account' => $transition['Payer_Account'],
                         'payment_amount' => $transition['PAYMENT_AMOUNT'],
                         'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
-                        'type'=>$this->inputsConfig?$this->inputsConfig->type:'perfectmoney'
+                        'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
 
                     ]
                 );

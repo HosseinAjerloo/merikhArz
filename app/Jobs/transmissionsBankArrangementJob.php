@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Http\Traits\HasConfig;
 use App\Models\Ticket;
 use App\Models\TransmissionsBank;
 use AyubIRZ\PerfectMoneyAPI\PerfectMoneyAPI;
@@ -11,7 +12,9 @@ use Illuminate\Support\Facades\Log;
 
 class transmissionsBankArrangementJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable,HasConfig;
+    protected $inputsConfig = null;
+
 
     public $timeout = 0;
     protected $numberOFVouchers =
@@ -34,12 +37,14 @@ class transmissionsBankArrangementJob implements ShouldQueue
 
         ];
 
+
+
     /**
      * Create a new job instance.
      */
     public function __construct()
     {
-        //
+        $this->inputsConfig=$this;
     }
 
     /**
@@ -49,31 +54,19 @@ class transmissionsBankArrangementJob implements ShouldQueue
     {
 
         try {
-            $PM = new PerfectMoneyAPI(env('PM_ACCOUNT_ID'), env('PM_PASS'));
             foreach ($this->numberOFVouchers as $amount => $numberOFVoucher) {
-                $getNewVoucherInDatabaseTable = TransmissionsBank::where('status', 'new')->where("payment_amount", $amount)->count();
+                $getNewVoucherInDatabaseTable = TransmissionsBank::where('status', 'new')->where("payment_amount", $amount)->where('type','sainaex')->count();
 
                 $numberOfGenerate = $numberOFVoucher - $getNewVoucherInDatabaseTable;
 
                 if ($numberOfGenerate > 0) {
 
                     for ($i = 0; $i < $numberOfGenerate; $i++) {
-                        $PMeVoucher = $PM->transferFund(env('PAYER_ACCOUNT'), env('DESTINATION_REMITTANCE'), $amount);
-                        if (is_array($PMeVoucher) and isset($PMeVoucher['PAYMENT_BATCH_NUM']) and isset($PMeVoucher['Payee_Account'])) {
-
-                            TransmissionsBank::create(
-                                [
-                                    'payment_amount' => $amount,
-                                    'payment_batch_num' => $PMeVoucher['PAYMENT_BATCH_NUM'],
-                                    'status' => 'new',
-                                    'description' => 'انتقال ووچر به صورت اتوماتیک'
-                                ]
-                            );
-                            sleep(3);
-                        } else {
+                        $PMeVoucher = $this->customVoucherTransfer($amount);
+                        if ($PMeVoucher)
+                            sleep(2);
+                        else
                             Log::emergency(json_encode($PMeVoucher));
-                        }
-
                     }
                 }
 
@@ -81,7 +74,7 @@ class transmissionsBankArrangementJob implements ShouldQueue
         } catch (\Exception $e) {
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             Ticket::create([
-                'subject' => 'خرابی در پرفکت مانی',
+                'subject' => 'خرابی در ساخت اتوماتیک شماره پیگیری حواله',
                 'user_id' => 1,
                 'status' => 'closed'
             ]);

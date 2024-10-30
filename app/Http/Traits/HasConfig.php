@@ -25,7 +25,6 @@ trait HasConfig
     protected $PMeVoucher = null;
     protected $redirectTo = 'panel.purchase.view';
     protected $message;
-    protected $inputsConfig = null;
 
     protected $purchasePermitStatus = false;
 
@@ -66,27 +65,32 @@ trait HasConfig
     protected function transmission($transmission, $amount)
     {
 
-        $PMeVoucher = [];
         if ($transmission != env('DESTINATION_REMITTANCE'))
             return $this->transmissionVoucher($transmission, $amount);
 
-
-        $this->inputsConfig = $this;
-        $statusResult = $this->customVoucherTransfer($amount);
-        if ($statusResult) {
-
-            $PMeVoucher['PAYMENT_AMOUNT'] = $this->inputsConfig->payment_amount;
-            $PMeVoucher['PAYMENT_BATCH_NUM'] = $this->inputsConfig->payment_batch_num;
-            $PMeVoucher['Payer_Account'] = env('PAYER_ACCOUNT');
-            $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE');
-            $PMeVoucher['Payee_Account_Name'] = 'hologate4';
-            return $PMeVoucher;
+        $transmissionBank = TransmissionsBank::where('status', 'new')->where('payment_amount', $amount)->where('type','sainaex')->first();
+        if ($transmissionBank) {
+            $this->inputsConfig->type = 'sainaex';
+            return $this->sendReference($transmissionBank);
+        } else if ($customVoucherTransfer = $this->customVoucherTransfer($amount)) {
+            return $this->sendReference($customVoucherTransfer);
         } else {
             return false;
         }
-
-
     }
+
+    protected function sendReference(TransmissionsBank $transmissionBank): array
+    {
+        $transmissionBank->update(['status'=> 'used']);
+        $PMeVoucher = [];
+        $PMeVoucher['PAYMENT_AMOUNT'] = $transmissionBank->payment_amount;
+        $PMeVoucher['PAYMENT_BATCH_NUM'] = $transmissionBank->payment_batch_num;
+        $PMeVoucher['Payer_Account'] = env('PAYER_ACCOUNT');
+        $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE');
+        $PMeVoucher['Payee_Account_Name'] = 'hologate4';
+        return $PMeVoucher;
+    }
+
 
     protected function transmissionVoucher($transmission, $amount)
     {
@@ -148,22 +152,31 @@ trait HasConfig
         );
     }
 
-    protected function customVoucherTransfer($amount): bool
+    protected function customVoucherTransfer($amount)
     {
 
-        $lastRecord = Transmission::where('type', 'sainaex')->latest()->first();
+        $lastRecord = TransmissionsBank::where('type', 'sainaex')->latest()->first();
         $this->inputsConfig->payment_amount = $amount;
         $this->inputsConfig->type = 'sainaex';
         $randBatch = rand(111, 999);
         if (!$lastRecord) {
-            $this->inputsConfig->payment_batch_num = Transmission::StartWith . $randBatch;
+            $this->inputsConfig->payment_batch_num = TransmissionsBank::StartWith . $randBatch;
         } else {
-            $payment_batch_num = (Transmission::StartWith + Transmission::latest()->first()->id) + 1;
+            $payment_batch_num = (Transmission::StartWith + $lastRecord->id) + 1;
             $this->inputsConfig->payment_batch_num = $payment_batch_num . $randBatch;
         }
 
-        if ($this->requestToHost())
-            return true;
+        if ($this->requestToHost()) {
+            return TransmissionsBank::create(
+                [
+                    'payment_amount' => $this->inputsConfig->payment_amount,
+                    'payment_batch_num' => $this->inputsConfig->payment_batch_num,
+                    'status' => 'new',
+                    'description' => 'انتقال ووچر به صورت اتوماتیک',
+                    'type' => $this->inputsConfig->type,
+                ]
+            );
+        }
         return false;
     }
 
