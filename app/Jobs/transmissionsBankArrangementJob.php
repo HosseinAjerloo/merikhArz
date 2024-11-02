@@ -9,6 +9,7 @@ use AyubIRZ\PerfectMoneyAPI\PerfectMoneyAPI;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 class transmissionsBankArrangementJob implements ShouldQueue
 {
@@ -45,6 +46,10 @@ class transmissionsBankArrangementJob implements ShouldQueue
     public function __construct()
     {
         $this->inputsConfig=$this;
+    }
+    public function middleware(): array
+    {
+        return [new WithoutOverlapping('transmissionsBankArrangementJob')];
     }
 
     /**

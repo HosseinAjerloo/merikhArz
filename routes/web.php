@@ -2,6 +2,7 @@
 
 
 use App\Models\Role;
+use App\Models\Transmission;
 use App\Models\VouchersBank;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -124,9 +125,12 @@ Route::fallback(function () {
 
 
 
-//Route::get('test',function (){
-//dd(\App\Models\Transmission::latest()->first()->id);
-//});
+Route::get('test',function (){
+    dd( $transmissionInMount=Transmission::TransmissionLimit(true)->sum('payment_amount'));
+    dd(\App\Models\TransmissionsBank::where('payment_amount',1)->where('type','sainaex')->get());
+});
+
+
 
 
 

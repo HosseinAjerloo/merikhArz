@@ -4,6 +4,7 @@ namespace App\Filters;
 
 use App\Models\FinanceTransaction;
 use Carbon\Carbon;
+use \App\Models\Transmission;
 
 abstract class VoucherFilters
 {
@@ -23,6 +24,8 @@ abstract class VoucherFilters
         $todayVoucher = FinanceTransaction::PurchaseLimit($today)->get();
         $inMount = Carbon::now()->format('m');
         $toMountVoucher = FinanceTransaction::PurchaseLimit(mount: $inMount)->get();
+        $transmissionInMount=Transmission::TransmissionLimit(true)->sum('payment_amount');
+        $transmissionInDay=Transmission::TransmissionLimit()->sum('payment_amount');
 
         foreach ($todayVoucher as $voucher) {
             $this->totalPerDay += $voucher->voucher->voucherAmount();
@@ -34,6 +37,14 @@ abstract class VoucherFilters
             return $this->DailyPurchase();
         }
         if ($this->totalPerMonth >= env('Monthly_Purchase_Limit')) {
+            return $this->MonthlyPurchase();
+        }
+        if ($transmissionInDay >= env('Daily_Purchase_Limit'))
+        {
+            return $this->DailyPurchase();
+        }
+        if ($transmissionInMount >= env('Monthly_Purchase_Limit'))
+        {
             return $this->MonthlyPurchase();
         }
         return true;
