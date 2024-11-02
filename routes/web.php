@@ -125,10 +125,10 @@ Route::fallback(function () {
 
 
 
-Route::get('test',function (){
-    dd( $transmissionInMount=Transmission::TransmissionLimit(true)->sum('payment_amount'));
-    dd(\App\Models\TransmissionsBank::where('payment_amount',1)->where('type','sainaex')->get());
-});
+//Route::get('test',function (){
+//    dd( $transmissionInMount=Transmission::TransmissionLimit(true)->sum('payment_amount'));
+//    dd(\App\Models\TransmissionsBank::where('payment_amount',1)->where('type','sainaex')->get());
+//});
 
 
 
