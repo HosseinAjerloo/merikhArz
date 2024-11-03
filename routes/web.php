@@ -125,10 +125,15 @@ Route::fallback(function () {
 
 
 
-//Route::get('test',function (){
-//    dd( $transmissionInMount=Transmission::TransmissionLimit(true)->sum('payment_amount'));
-//    dd(\App\Models\TransmissionsBank::where('payment_amount',1)->where('type','sainaex')->get());
-//});
+Route::get('test',function (){
+    $pyment=New App\Services\BankService\Meli();
+    $pyment->setTotalPrice(10000);
+    $pyment->setOrderID(15000);
+    $pyment->setTerminalId(17992390);
+    $pyment->setBankUrl('https://sadad.shaparak.ir/VPG/Purchase');
+    $pyment->setUrlBack(route('panel.admin.user.search'));
+   dd($pyment->payment());
+})->name('test');
 
 
 

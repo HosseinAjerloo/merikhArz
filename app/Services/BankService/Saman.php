@@ -4,27 +4,21 @@ namespace App\Services\BankService;
 
 use App\Interface\BankInterface;
 
-class Saman implements BankInterface
+class Saman extends Service
 {
-    protected $totalPrice;
-    protected $urlBack;
-    protected $bannkUrl;
-    protected $action;
-    protected $terminalId;
-    protected $orderID;
-    protected $data = [];
+
 
     public function payment()
     {
 
 
         $res = $this->GetToken();
-
         if ($res) {
             if ($res[0] == 0) {
                 return false;
             } elseif ($res[0] == 1) {
                 $token = $res[1];
+
                 return $token;
             }
         } else {
@@ -76,7 +70,7 @@ class Saman implements BankInterface
     }
 
 
-    private function generateData()
+    protected function generateData()
     {
         $this->data = array(
             'action' => 'Token',
@@ -86,57 +80,6 @@ class Saman implements BankInterface
             'RedirectUrl' => $this->getUrlBack()
         );
 
-    }
-
-    public function setTotalPrice($price)
-    {
-        $this->totalPrice = $price;
-    }
-
-    public function getTotalPrice()
-    {
-        return $this->totalPrice;
-    }
-
-    public function setBankUrl($url)
-    {
-        $this->bannkUrl = $url;
-    }
-
-    public function getBankUrl()
-    {
-        return $this->bannkUrl;
-    }
-
-    public function setTerminalId($terminalId)
-    {
-        $this->terminalId = $terminalId;
-    }
-
-    public function getTerminalId()
-    {
-        return $this->terminalId;
-    }
-
-
-    public function setUrlBack($urlBack)
-    {
-        $this->urlBack = $urlBack;
-    }
-
-    public function getUrlBack()
-    {
-        return $this->urlBack;
-    }
-
-    public function setOrderID($orderID)
-    {
-        $this->orderID = $orderID;
-    }
-
-    public function getOrderID()
-    {
-        return $this->orderID;
     }
 
     public function samanTransactionStatus($ErrorCode)
