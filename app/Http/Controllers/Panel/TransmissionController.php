@@ -68,7 +68,7 @@ class TransmissionController extends Controller
                 $inputs['type'] = 'transmission';
                 $inputs['status'] = 'requested';
                 $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
-                $inputs['description'] = 'انتقال کارت هدیه پرفکت مانی';
+                $inputs['description'] = 'انتقال حواله پرفکت مانی';
 
                 $invoice = Invoice::create($inputs);
 
@@ -97,12 +97,12 @@ class TransmissionController extends Controller
 
                         ]
                     );
-                    $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+                    $message = "سلام انتقال حواله پرفکت مانی انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
                     $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
                     return redirect()->route('panel.transfer.information', $transitionDelivery);
 
                 } else {
-                    $invoice->update(['status' => 'failed', 'description' => 'انتقال کارت هدیه پرفکت مانی ناموفق بود و عملیات کسر موجودی از کیف پول شما متوقف شد.']);
+                    $invoice->update(['status' => 'failed', 'description' => 'انتقال حواله پرفکت مانی ناموفق بود و عملیات کسر موجودی از کیف پول شما متوقف شد.']);
                     return redirect()->route('panel.transfer.fail');
                 }
 
@@ -119,7 +119,7 @@ class TransmissionController extends Controller
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
                 $inputs['status'] = 'requested';
                 $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
-                $inputs['description'] = 'انتقال کارت هدیه پرفکت مانی';
+                $inputs['description'] = 'انتقال حواله  پرفکت مانی';
                 $invoice = Invoice::create($inputs);
 
                 $transition = $this->transmission($inputs['transmission'], $inputs['custom_payment']);
@@ -148,12 +148,12 @@ class TransmissionController extends Controller
 
                         ]
                     );
-                    $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+                    $message = "سلام انتقال حواله پرفکت مانی انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
                     $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
                     return redirect()->route('panel.transfer.information', $transitionDelivery);
 
                 } else {
-                    $invoice->update(['status' => 'failed', 'description' => 'انتقال کارت هدیه پرفکت مانی ناموفق بود و عملیات کسر موجودی از کیف پول شما متوقف شد.']);
+                    $invoice->update(['status' => 'failed', 'description' => 'انتقال حواله پرفکت مانی ناموفق بود و عملیات کسر موجودی از کیف پول شما متوقف شد.']);
                     return redirect()->route('panel.transfer.fail');
                 }
             } else {
@@ -196,7 +196,7 @@ class TransmissionController extends Controller
             $inputs['status'] = 'requested';
             $inputs['bank_id'] = $bank->id;
             $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
-            $inputs['description'] = ' انتقال کارت هدیه پرفکت مانی از طریق ' . $bank->name;
+            $inputs['description'] = ' انتقال حواله پرفکت مانی از طریق ' . $bank->name;
 
 
             $invoice = Invoice::create($inputs);
@@ -227,7 +227,7 @@ class TransmissionController extends Controller
                 'payment_id' => $payment->id,
             ]);
             if (!$status) {
-                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال کارت هدیه پرفکت مانی  شما لغو شد "]);
+                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال حواله پرفکت مانی  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
                 return redirect()->route('panel.transmission.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
@@ -364,7 +364,7 @@ class TransmissionController extends Controller
                         'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
                     ]
                 );
-                $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+                $message = "سلام انتقال حواله پرفکت مانی انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
                 $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
                 return redirect()->route('panel.transfer.information', $transitionDelivery);
 
@@ -459,7 +459,7 @@ class TransmissionController extends Controller
             $inputs['status'] = 'requested';
             $inputs['bank_id'] = $bank->id;
             $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
-            $inputs['description'] = ' انتقال کارت هدیه پرفکت مانی از طریق ' . $bank->name;
+            $inputs['description'] = ' انتقال حواله پرفکت مانی از طریق ' . $bank->name;
 
 
             $invoice = Invoice::create($inputs);
@@ -490,7 +490,7 @@ class TransmissionController extends Controller
                 'payment_id' => $payment->id,
             ]);
             if (!$status) {
-                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال کارت هدیه پرفکت مانی  شما لغو شد "]);
+                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال حواله پرفکت مانی  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
@@ -628,7 +628,7 @@ class TransmissionController extends Controller
 
                     ]
                 );
-                $message = "سلام انتقال کارت هدیه انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+                $message = "سلام انتقال حواله پرفکت مانی انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
                 $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
                 return redirect()->route('panel.transfer.information', $transitionDelivery);
 
