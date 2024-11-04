@@ -73,7 +73,7 @@ class PanelController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $service->amount;
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
 
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.purchase.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
@@ -136,7 +136,7 @@ class PanelController extends Controller
 
             } elseif (isset($inputs['custom_payment'])) {
 
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
 
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.purchase.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
@@ -239,10 +239,10 @@ class PanelController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $service->amount;
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
             } elseif (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
             } else {
                 return redirect()->route('panel.purchase.view')->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
@@ -523,6 +523,7 @@ class PanelController extends Controller
             $inputs = $request->all();
             $payment = Payment::find(session()->get('payment'));
             $inputs['price'] .= 0;
+            $inputs['price']=floor($inputs['price']);
             $bank = Bank::find($inputs['bank_id']);
             $user = Auth::user();
             $balance = Auth::user()->getCreaditBalance();

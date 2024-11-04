@@ -183,10 +183,10 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $service->amount;
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
             } elseif (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
             } else {
                 return redirect()->route('panel.transmission.view')->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
@@ -201,7 +201,7 @@ class TransmissionController extends Controller
 
             $invoice = Invoice::create($inputs);
             $objBank = new $bank->class;
-            $objBank->setTotalPrice(floor($voucherPrice));
+            $objBank->setTotalPrice($voucherPrice);
             $payment = Payment::create(
                 [
                     'bank_id' => $bank->id,
@@ -449,7 +449,7 @@ class TransmissionController extends Controller
 
             if (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice = $dollar->DollarRateWithAddedValue() * $inputs['custom_payment'];
+                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
             } else {
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
@@ -464,7 +464,7 @@ class TransmissionController extends Controller
 
             $invoice = Invoice::create($inputs);
             $objBank = new $bank->class;
-            $objBank->setTotalPrice(floor($voucherPrice));
+            $objBank->setTotalPrice($voucherPrice);
             $payment = Payment::create(
                 [
                     'bank_id' => $bank->id,
