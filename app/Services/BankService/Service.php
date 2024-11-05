@@ -2,6 +2,8 @@
 
 namespace App\Services\BankService;
 
+use App\Models\Bank;
+
 abstract class Service
 {
     protected $totalPrice;
@@ -11,6 +13,8 @@ abstract class Service
     protected $terminalId;
     protected $orderID;
     protected $data = [];
+    protected  $objectBank = null;
+
 
 
     public function setTotalPrice($price)
@@ -66,8 +70,12 @@ abstract class Service
     abstract public function payment();
 
     abstract public function GetToken();
+    abstract function cullRequest($url);
     abstract public function backBank();
     abstract protected function generateData();
-    abstract public function samanTransactionStatus($ErrorCode);
-    abstract public function samanVerifyTransaction($ErrorCode);
+    abstract public function transactionStatus();
+    abstract public function verifyTransaction($ErrorCode);
+    abstract public function verify();
+    abstract public function connectionToBank($token);
+    abstract public function setBankModel(Bank $bank);
 }

@@ -2,7 +2,8 @@
 
 namespace App\Services\BankService;
 
-use App\Interface\BankInterface;
+
+use App\Models\Bank;
 
 class Saman extends Service
 {
@@ -30,16 +31,19 @@ class Saman extends Service
     public function GetToken()
     {
         $this->generateData();
+        return $this->cullRequest($this->getBankUrl());
+    }
+
+    function cullRequest($url)
+    {
         $data = json_encode($this->data);
-
-
-        $curl = curl_init($this->getBankUrl());
+        $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($data)));
         curl_setopt($curl, CURLOPT_SSL_CIPHER_LIST, 'DEFAULT@SECLEVEL=1');
-        curl_setopt($curl,CURLOPT_TIMEOUT,30);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
 
         $result = curl_exec($curl);
         curl_close($curl);
@@ -55,8 +59,6 @@ class Saman extends Service
         } else {
             return false;
         }
-
-
     }
 
     public function backBank()
@@ -82,10 +84,10 @@ class Saman extends Service
 
     }
 
-    public function samanTransactionStatus($ErrorCode)
+    public function transactionStatus()
     {
 
-        $return_value = match ($ErrorCode) {
+        $return_value = match (request()->input('Status')) {
             "1" => "انصراف کاربر از درگاه پرداخت",
             "2" => "پرداخت با موفقیت انجام شد",
             "3" => "پرداخت انجام نشد",
@@ -102,7 +104,7 @@ class Saman extends Service
             "602" => "در عمليات تاييد تراکنش از سمت بانک خطايي رخ داده است !",
             "603" => "مبلغ پرداخت شده صحيح نمي باشد !",
             "909" => "ناتوانی در ذخیره کردن کد بانک",
-            default => "کد ارور: " . $ErrorCode
+            default => "کد ارور: " . request()->input('Status')
 
         };
         return $return_value;
@@ -110,7 +112,7 @@ class Saman extends Service
 
     }
 
-    public function samanVerifyTransaction($ErrorCode)
+    public function verifyTransaction($ErrorCode)
     {
 
         $return_value = match ($ErrorCode) {
@@ -138,4 +140,20 @@ class Saman extends Service
 
     }
 
+    public function verify()
+    {
+        $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
+        $back_price = $client->VerifyTransaction(request()->input('RefNum'), $this->objectBank->terminal_id);
+        return $back_price;
+    }
+
+    public function connectionToBank($token)
+    {
+        return view('welcome', ['token' => $token, 'url' => $this->getBankUrl()]);
+    }
+
+    public function setBankModel(Bank $bank)
+    {
+        $this->objectBank = $bank;
+    }
 }

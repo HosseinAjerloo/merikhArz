@@ -12,24 +12,23 @@ use Illuminate\Http\Client\RequestException;
 use AyubIRZ\PerfectMoneyAPI\PerfectMoneyAPI;
 
 Route::middleware('guest')->group(function () {
-    Route::name('login.')->prefix('login')->group(function (){
+    Route::name('login.')->prefix('login')->group(function () {
         Route::get('', [App\Http\Controllers\Auth\LoginController::class, 'index'])->name('index');
         Route::post('', [App\Http\Controllers\Auth\LoginController::class, 'sendCode'])->name('sendCode');
         Route::get('dologin/{otp:token}', [App\Http\Controllers\Auth\LoginController::class, 'dologin'])->name('dologin');
         Route::post('dologin/{otp:token}', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('dologin.post');
         Route::post('resend/{otp:token}', [App\Http\Controllers\Auth\LoginController::class, 'resend'])->name('resend');
-        Route::post('register/password',[App\Http\Controllers\Auth\LoginController::class,'registerPassword'])->name('register-password');
-        Route::get('simple-login',[App\Http\Controllers\Auth\LoginController::class,'simpleLogin'])->name('simple');
-        Route::post('simple-login',[App\Http\Controllers\Auth\LoginController::class,'simpleLoginPost'])->name('simple-post');
-        Route::get('set-password',[App\Http\Controllers\Auth\LoginController::class,'setPassword'])->name('setPassword');
-        Route::get("loginBySms",[App\Http\Controllers\Auth\LoginController::class,'loginBySms'])->name('login-BySms');
+        Route::post('register/password', [App\Http\Controllers\Auth\LoginController::class, 'registerPassword'])->name('register-password');
+        Route::get('simple-login', [App\Http\Controllers\Auth\LoginController::class, 'simpleLogin'])->name('simple');
+        Route::post('simple-login', [App\Http\Controllers\Auth\LoginController::class, 'simpleLoginPost'])->name('simple-post');
+        Route::get('set-password', [App\Http\Controllers\Auth\LoginController::class, 'setPassword'])->name('setPassword');
+        Route::get("loginBySms", [App\Http\Controllers\Auth\LoginController::class, 'loginBySms'])->name('login-BySms');
     });
-    Route::get('forgot-password',[App\Http\Controllers\Auth\LoginController::class,'forgotPassword'])->name('forgotPassword');
-    Route::get('forgot-password/{otp:token}',[App\Http\Controllers\Auth\LoginController::class,'forgotPasswordToken'])->name('forgotPassword.token');
+    Route::get('forgot-password', [App\Http\Controllers\Auth\LoginController::class, 'forgotPassword'])->name('forgotPassword');
+    Route::get('forgot-password/{otp:token}', [App\Http\Controllers\Auth\LoginController::class, 'forgotPasswordToken'])->name('forgotPassword.token');
 
 });
 Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
-
 
 
 Route::middleware(['auth'])->group(function () {
@@ -57,12 +56,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('transmission', [App\Http\Controllers\Panel\TransmissionController::class, 'store'])->name('panel.transmission');
         Route::post('voucher-transfer-through-bank', [App\Http\Controllers\Panel\TransmissionController::class, 'transferFromThePaymentGateway'])->name('panel.transferFromThePaymentGateway');
         Route::post('back/voucher-transfer-through-bank', [App\Http\Controllers\Panel\TransmissionController::class, 'transferFromThePaymentGatewayBack'])->name('panel.back.transferFromThePaymentGateway')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
-        Route::post('transfer',[App\Http\Controllers\Panel\TransmissionController::class, 'transferConnectionBank'])->name('panel.transfer.external.post');
-        Route::post('transfer/back-bank',[App\Http\Controllers\Panel\TransmissionController::class, 'transferConnectionBackBank'])->name('panel.transfer.external.back-bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);;
+        Route::post('transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'transferConnectionBank'])->name('panel.transfer.external.post');
+        Route::post('transfer/back-bank', [App\Http\Controllers\Panel\TransmissionController::class, 'transferConnectionBackBank'])->name('panel.transfer.external.back-bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);;
 
 
     });
-    Route::get('transfer',[App\Http\Controllers\Panel\TransmissionController::class, 'transfer'])->name('panel.transfer.external');
+    Route::get('transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'transfer'])->name('panel.transfer.external');
 
     Route::post('back/Purchase-through-the-bank', [App\Http\Controllers\Panel\PanelController::class, 'backPurchaseThroughTheBank'])->name('panel.Purchase-through-the-bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
     Route::get('wallet-charging', [App\Http\Controllers\Panel\PanelController::class, 'walletCharging'])->name('panel.wallet.charging');
@@ -121,12 +120,24 @@ Route::fallback(function () {
 });
 
 
+Route::get('test', function () {
 
 
 
 
-Route::get('test',function (){
-    dd(floor(1978892.5));
+
+    $objectBank = \App\Models\Bank::find(2);
+    $pyment = new ($objectBank->class);
+    $pyment->setTotalPrice(10000);
+    $pyment->setOrderID(15000);
+    $pyment->setTerminalId($objectBank->terminal_id);
+    $pyment->setBankUrl($objectBank->url);
+    $pyment->setBankModel($objectBank);
+    $pyment->setUrlBack(route('panel.admin.user.search'));
+    $token=$pyment->payment();
+
+
+
 })->name('test');
 
 
