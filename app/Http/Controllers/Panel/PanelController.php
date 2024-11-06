@@ -313,6 +313,7 @@ class PanelController extends Controller
 //
     public function backPurchaseThroughTheBank(Request $request)
     {
+        dd($request->all());
         try {
             $satiaService = new SatiaService();
 
