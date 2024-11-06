@@ -19,6 +19,6 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {Auth::loginUsingId(1);
+    {
     }
 }
