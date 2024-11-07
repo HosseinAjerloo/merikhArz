@@ -328,7 +328,7 @@ class PanelController extends Controller
             $objBank = new $bank->class;
             $objBank->setBankModel($bank);
             Log::channel('bankLog')->emergency(PHP_EOL . "Return from the bank and the bank's response to the purchase of the service " . PHP_EOL . json_encode($request->all()) . PHP_EOL .
-                'Bank message: ' . PHP_EOL . $objBank->samanTransactionStatus($request->input('Status')) . PHP_EOL .
+                'Bank message: ' . PHP_EOL . $objBank->transactionStatus() . PHP_EOL .
                 'user ID :' . $user->id
                 . PHP_EOL
             );
