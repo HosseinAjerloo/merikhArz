@@ -547,6 +547,8 @@ class PanelController extends Controller
             $objBank->setOrderID($payment->id + Payment::transactionNumber);
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.wallet.charging.back'));
+            $objBank->setBankModel($bank);
+
 
             session()->put('payment', $payment->id);
             session()->put('invoice', $invoice->id);
@@ -574,7 +576,6 @@ class PanelController extends Controller
 
                 return redirect()->route('panel.index')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
-            $url = $objBank->getBankUrl();
             $token = $status;
             Log::channel('bankLog')->emergency(PHP_EOL . 'Connection with the bank payment gateway to charge the wallet '
                 . PHP_EOL .
@@ -590,7 +591,8 @@ class PanelController extends Controller
             );
 
 
-            return view('welcome', compact('token', 'url'));
+            return $objBank->connectionToBank($token);
+
         } else {
             return redirect()->route('panel.index')->withErrors(['error' => 'خطایی رخ داد لفا مجدد بعدا تلاش فرمایید.']);
         }
@@ -608,8 +610,10 @@ class PanelController extends Controller
             $financeTransaction = FinanceTransaction::find(session()->get('financeTransaction'));
             $bank = $payment->bank;
             $objBank = new $bank->class;
+            $objBank->setBankModel($bank);
+
             Log::channel('bankLog')->emergency(PHP_EOL . "Back from the bank and the bank's response to charging the wallet " . PHP_EOL . json_encode($request->all()) . PHP_EOL .
-                'Bank message: ' . PHP_EOL . $objBank->samanTransactionStatus($request->input('Status')) . PHP_EOL .
+                'Bank message: ' . PHP_EOL . $objBank->transactionStatus() . PHP_EOL .
                 'user ID :' . $user->id
                 . PHP_EOL
             );
@@ -622,20 +626,20 @@ class PanelController extends Controller
                         'state' => 'failed'
 
                     ]);
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status')), 'status' => 'fail']);
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                return redirect()->route('panel.index')->withErrors(['error' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
+                return redirect()->route('panel.index')->withErrors(['error' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
             }
-            $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
 
-            $back_price = $client->VerifyTransaction($inputs['RefNum'], $bank->terminal_id);
-            if ($back_price != $payment->amount or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price)]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price), 'status' => 'fail']);
+            $back_price = $objBank->verify($payment->amount);
+
+            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price)]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price), 'status' => 'fail']);
 
                 Log::channel('bankLog')->emergency(PHP_EOL . "Bank Credit VerifyTransaction wallet recharge  : " . json_encode($request->all()) . PHP_EOL .
-                    'Bank message: ' . $objBank->samanVerifyTransaction($back_price)
+                    'Bank message: ' . $objBank->verifyTransaction($back_price)
                     . PHP_EOL .
                     'user ID :' . $user->id
                     . PHP_EOL
