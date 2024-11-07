@@ -216,6 +216,9 @@ class TransmissionController extends Controller
             $objBank->setBankUrl($bank->url);
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.back.transferFromThePaymentGateway'));
+            $objBank->setBankModel($bank);
+
+
 
             $status = $objBank->payment();
             $financeTransaction = FinanceTransaction::create([
@@ -232,7 +235,6 @@ class TransmissionController extends Controller
 
                 return redirect()->route('panel.transmission.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
-            $url = $objBank->getBankUrl();
             $token = $status;
             session()->put('transmission', $inputs['transmission']);
             session()->put('payment', $payment->id);
@@ -248,7 +250,8 @@ class TransmissionController extends Controller
                 'user ID: ' . $user->id
                 . PHP_EOL
             );
-            return view('welcome', compact('token', 'url'));
+            return $objBank->connectionToBank($token);
+
         } catch (\Exception $e) {
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
@@ -271,8 +274,10 @@ class TransmissionController extends Controller
 
             $bank = $payment->bank;
             $objBank = new $bank->class;
+            $objBank->setBankModel($bank);
+
             Log::channel('bankLog')->emergency(PHP_EOL . " Bank return response from voucher transfer " . PHP_EOL . json_encode($request->all()) . PHP_EOL .
-                'Bank message: ' . PHP_EOL . $objBank->samanTransactionStatus($request->input('Status')) . PHP_EOL .
+                'Bank message: ' . PHP_EOL . $objBank->transactionStatus() . PHP_EOL .
                 'user ID :' . $user->id
                 . PHP_EOL
             );
@@ -285,26 +290,25 @@ class TransmissionController extends Controller
                         'state' => 'failed'
 
                     ]);
-                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanTransactionStatus($request->input('Status')) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
+                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->transactionStatus() . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status')), 'status' => 'fail']);
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                return redirect()->route('panel.transmission.view')->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->samanTransactionStatus($request->input('Status'))]);
+                return redirect()->route('panel.transmission.view')->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
             }
-            $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
+            $back_price = $objBank->verify($payment->amount);
 
-            $back_price = $client->VerifyTransaction($inputs['RefNum'], $bank->terminal_id);
-            if ($back_price != $payment->amount or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
 
-                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanVerifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
+                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->verifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
 
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price)]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price), 'status' => 'fail']);
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price)]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price), 'status' => 'fail']);
 
                 Log::channel('bankLog')->emergency(PHP_EOL . "Bank Credit VerifyTransaction from voucher transfer : " . json_encode($request->all()) . PHP_EOL .
-                    'Bank message: ' . $objBank->samanVerifyTransaction($back_price) .
+                    'Bank message: ' . $objBank->verifyTransaction($back_price) .
                     PHP_EOL .
                     'user Id: ' . $user->id
                     . PHP_EOL
@@ -479,6 +483,9 @@ class TransmissionController extends Controller
             $objBank->setBankUrl($bank->url);
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.transfer.external.back-bank'));
+            $objBank->setBankModel($bank);
+
+
 
             $status = $objBank->payment();
             $financeTransaction = FinanceTransaction::create([
@@ -495,7 +502,6 @@ class TransmissionController extends Controller
 
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
-            $url = $objBank->getBankUrl();
             $token = $status;
             session()->put('transmission', $inputs['transmission']);
             session()->put('payment', $payment->id);
@@ -511,7 +517,8 @@ class TransmissionController extends Controller
                 'user ID: ' . $user->id
                 . PHP_EOL
             );
-            return view('welcome', compact('token', 'url'));
+            return $objBank->connectionToBank($token);
+
         } catch (\Exception $e) {
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
@@ -534,8 +541,10 @@ class TransmissionController extends Controller
 
             $bank = $payment->bank;
             $objBank = new $bank->class;
+            $objBank->setBankModel($bank);
+
             Log::channel('bankLog')->emergency(PHP_EOL . " Bank return response from voucher transfer " . PHP_EOL . json_encode($request->all()) . PHP_EOL .
-                'Bank message: ' . PHP_EOL . $objBank->samanTransactionStatus($request->input('Status')) . PHP_EOL .
+                'Bank message: ' . PHP_EOL . $objBank->transactionStatus() . PHP_EOL .
                 'user ID :' . $user->id
                 . PHP_EOL
             );
@@ -548,17 +557,18 @@ class TransmissionController extends Controller
                         'state' => 'failed'
 
                     ]);
-                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanTransactionStatus($request->input('Status')) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
+                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->transactionStatus() . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status')), 'status' => 'fail']);
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                return redirect()->route('panel.transfer.external')->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->samanTransactionStatus($request->input('Status'))]);
+                return redirect()->route('panel.transfer.external')->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
             }
-            $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
 
-            $back_price = $client->VerifyTransaction($inputs['RefNum'], $bank->terminal_id);
-            if ($back_price != $payment->amount or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+
+            $back_price = $objBank->verify($payment->amount);
+
+            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
 
                 $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanVerifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
