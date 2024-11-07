@@ -16,11 +16,11 @@
     <section id="menu"
              class=" menu-non-show absolute w-3/5 sm:w-3/6 lg:w-1/4 xl:w-1/5 top-14   z-10 pb-2  text-white bg-sky-500 rounded-ee-md overflow-hidden transition-all duration-500 ">
         <article class="space-y-2">
-            <a href="{{route('panel.purchase.view')}}"
-               class="text-sm flex  items-center px-3 py-1.5 space-x-2 space-x-reverse border-t border-white">
-                <img src="{{asset('src/images/pm.png')}}" alt="" class="w-4 h-4">
-                <p class="sm:text-base "> خرید ووچر پرفکت مانی </p>
-            </a>
+{{--            <a href="{{route('panel.purchase.view')}}"--}}
+{{--               class="text-sm flex  items-center px-3 py-1.5 space-x-2 space-x-reverse border-t border-white">--}}
+{{--                <img src="{{asset('src/images/pm.png')}}" alt="" class="w-4 h-4">--}}
+{{--                <p class="sm:text-base "> خرید ووچر پرفکت مانی </p>--}}
+{{--            </a>--}}
 
 
             <a href="{{route('panel.order')}}"
