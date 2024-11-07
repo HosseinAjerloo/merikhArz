@@ -270,6 +270,8 @@ class PanelController extends Controller
             $objBank->setBankUrl($bank->url);
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.Purchase-through-the-bank'));
+            $objBank->setBankModel($bank);
+
 
             $status = $objBank->payment();
             $financeTransaction = FinanceTransaction::create([
@@ -285,9 +287,7 @@ class PanelController extends Controller
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
                 return redirect()->route('panel.purchase.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
-            $url = $objBank->getBankUrl();
             $token = $status;
-
             session()->put('payment', $payment->id);
             session()->put('financeTransaction', $financeTransaction->id);
             Log::channel('bankLog')->emergency(PHP_EOL . 'Connection with the bank payment gateway '
@@ -301,7 +301,7 @@ class PanelController extends Controller
                 'user ID: ' . $user->id
                 . PHP_EOL
             );
-            return view('welcome', compact('token', 'url'));
+            return $objBank->connectionToBank($token);
         }catch (\Exception $e)
         {
             SendAppAlertsJob::dispatch('در ارتباط بابانک برای خرید پرفکت مانی خطایی به وجود آمد لطفا پیگیری شود')->onQueue('perfectmoney');

@@ -3,7 +3,9 @@
 namespace App\Services\BankService;
 
 use App\Interface\BankInterface;
+use App\Jobs\SendAppAlertsJob;
 use App\Models\Bank;
+use Illuminate\Support\Facades\Log;
 
 class Meli extends Service
 {
@@ -18,11 +20,14 @@ class Meli extends Service
     public function payment()
     {
         $arrres = $this->GetToken();
-        dd($arrres);
         if ($arrres->ResCode == 0) {
             $token = $arrres->Token;
             return $token;
         } else {
+            Log::emergency('An error occurred while connecting to National Bank :'.PHP_EOL.
+            $arrres->Description);
+
+            SendAppAlertsJob::dispatch('هنگام اتصال به بانک ملی خطایی رخ  داد و اتصال برقرار نشد')->onQueue('perfectmoney');
             return false;
         }
     }
@@ -35,18 +40,29 @@ class Meli extends Service
 
     function cullRequest($url)
     {
-        $str_data = json_encode($this->data);
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $str_data);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($str_data)));
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        $result = curl_exec($curl);
-        curl_close($curl);
-        $arrres = json_decode($result);
+        try {
+            $str_data = json_encode($this->data);
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $str_data);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($str_data)));
+            curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+            $result = curl_exec($curl);
+            curl_close($curl);
+            $arrres = json_decode($result);
 
-        return $arrres;
+            return $arrres;
+        }
+        catch (\Exception $e)
+        {
+
+            Log::emergency('An error occurred while connecting to National Bank '.PHP_EOL.
+            $e->getMessage());
+            SendAppAlertsJob::dispatch('هنگام اتصال به بانک ملی خطایی رخ  داد و نوع خطا در لاگ ذخیره شد لطفا پیگیری کنید')->onQueue('perfectmoney');
+
+            return false;
+        }
 
     }
 
@@ -246,7 +262,7 @@ class Meli extends Service
         $ResCode = request()->input('ResCode');
         $Token = request()->input('token');
 
-        if ($ResCode == 100) {
+        if ($ResCode == 0) {
 
             $this->data = array('Token' => $Token, 'SignData' => $this->encrypt_pkcs7_meli($Token, $key));
             $arrres = $this->cullRequest('https://sadad.shaparak.ir/vpg/api/v0/Advice/Verify');

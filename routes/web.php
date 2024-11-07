@@ -123,9 +123,6 @@ Route::fallback(function () {
 Route::get('test', function () {
 
 
-
-
-
     $objectBank = \App\Models\Bank::find(2);
     $pyment = new ($objectBank->class);
     $pyment->setTotalPrice(10000);
@@ -134,7 +131,7 @@ Route::get('test', function () {
     $pyment->setBankUrl($objectBank->url);
     $pyment->setBankModel($objectBank);
     $pyment->setUrlBack(route('panel.admin.user.search'));
-    $token=$pyment->payment();
+    dd($pyment);
 
 
 

@@ -24,7 +24,7 @@ class Bank extends Model
         ],
         [
             'name'=>'درگاه پرداخت بانک ملی',
-            'url'=>'https://sadad.shaparak.ir/VPG/Purchase?Token',
+            'url'=>'https://sadad.shaparak.ir/VPG/Purchase?Token=',
             'terminal_id'=>17992390,
             'description'=>'درگاه پرداخت بانک ملی',
             'is_active'=>1,
