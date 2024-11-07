@@ -75,7 +75,7 @@ abstract class Service
     abstract protected function generateData();
     abstract public function transactionStatus();
     abstract public function verifyTransaction($ErrorCode);
-    abstract public function verify();
+    abstract public function verify($amount=0);
     abstract public function connectionToBank($token);
     abstract public function setBankModel(Bank $bank);
 }

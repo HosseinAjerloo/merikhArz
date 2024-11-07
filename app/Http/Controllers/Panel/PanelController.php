@@ -253,6 +253,7 @@ class PanelController extends Controller
             $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
             $inputs['description'] = ' خرید کارت هدیه پرفکت مانی از طریق ' . $bank->name;
 
+
             $invoice = Invoice::create($inputs);
             $objBank = new $bank->class;
             $objBank->setTotalPrice($voucherPrice);
@@ -265,6 +266,8 @@ class PanelController extends Controller
 
                 ]
             );
+
+
             $payment->update(['order_id' => $payment->id + Payment::transactionNumber]);
             $objBank->setOrderID($payment->id + Payment::transactionNumber);
             $objBank->setBankUrl($bank->url);
@@ -302,10 +305,9 @@ class PanelController extends Controller
                 . PHP_EOL
             );
             return $objBank->connectionToBank($token);
-        }catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             SendAppAlertsJob::dispatch('در ارتباط بابانک برای خرید پرفکت مانی خطایی به وجود آمد لطفا پیگیری شود')->onQueue('perfectmoney');
-            Log::emergency(PHP_EOL.$e->getMessage().PHP_EOL);
+            Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             return redirect()->route('panel.purchase.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
@@ -313,7 +315,6 @@ class PanelController extends Controller
 //
     public function backPurchaseThroughTheBank(Request $request)
     {
-        dd($request->all());
         try {
             $satiaService = new SatiaService();
 
@@ -325,6 +326,7 @@ class PanelController extends Controller
             $financeTransaction = FinanceTransaction::find(session()->get('financeTransaction'));
             $bank = $payment->bank;
             $objBank = new $bank->class;
+            $objBank->setBankModel($bank);
             Log::channel('bankLog')->emergency(PHP_EOL . "Return from the bank and the bank's response to the purchase of the service " . PHP_EOL . json_encode($request->all()) . PHP_EOL .
                 'Bank message: ' . PHP_EOL . $objBank->samanTransactionStatus($request->input('Status')) . PHP_EOL .
                 'user ID :' . $user->id
@@ -339,26 +341,26 @@ class PanelController extends Controller
                         'state' => 'failed'
 
                     ]);
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status')), 'status' => 'fail']);
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanTransactionStatus($request->input('Status')) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
+                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->transactionStatus() . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
 
-                return redirect()->route('panel.purchase.view')->withErrors(['error' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanTransactionStatus($request->input('Status'))]);
+                return redirect()->route('panel.purchase.view')->withErrors(['error' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
             }
-            $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
 
-            $back_price = $client->VerifyTransaction($inputs['RefNum'], $bank->terminal_id);
-            if ($back_price != $payment->amount or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
-                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price)]);
-                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->samanVerifyTransaction($back_price), 'status' => 'fail']);
+            $back_price = $objBank->verify($payment->amount);
 
-                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->samanVerifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
+            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+                $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price)]);
+                $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price), 'status' => 'fail']);
+
+                $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->verifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
 
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
                 Log::channel('bankLog')->emergency(PHP_EOL . "Bank Credit VerifyTransaction Purchase Voucher : " . json_encode($request->all()) . PHP_EOL .
-                    'Bank message: ' . $objBank->samanVerifyTransaction($back_price) .
+                    'Bank message: ' . $objBank->verifyTransaction($back_price) .
                     PHP_EOL .
                     'user Id: ' . $user->id
                     . PHP_EOL
@@ -484,7 +486,7 @@ class PanelController extends Controller
                 return Response::json(['status' => false]);
             }
         } catch (\Exception $e) {
-            Log::emergency(PHP_EOL.$e->getMessage().PHP_EOL);
+            Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در خرید پرفکت مانی ازطریق جاوااسکریپت خطایی به وجود آمد لطفا سرویس پرفکت مانی چک شود')->onQueue('perfectmoney');
 
             return Response::json(['status' => false]);
@@ -524,7 +526,7 @@ class PanelController extends Controller
             $inputs = $request->all();
             $payment = Payment::find(session()->get('payment'));
             $inputs['price'] .= 0;
-            $inputs['price']=floor($inputs['price']);
+            $inputs['price'] = floor($inputs['price']);
             $bank = Bank::find($inputs['bank_id']);
             $user = Auth::user();
             $balance = Auth::user()->getCreaditBalance();

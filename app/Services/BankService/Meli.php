@@ -256,7 +256,7 @@ class Meli extends Service
     }
 
 
-    public function verify()
+    public function verify($amount=0)
     {
         $key = $this->objectBank->password;
         $ResCode = request()->input('ResCode');

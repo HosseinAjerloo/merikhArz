@@ -140,11 +140,11 @@ class Saman extends Service
 
     }
 
-    public function verify()
+    public function verify($amount = 0)
     {
         $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
         $back_price = $client->VerifyTransaction(request()->input('RefNum'), $this->objectBank->terminal_id);
-        return $back_price;
+        return $back_price == $amount ? true : $back_price;
     }
 
     public function connectionToBank($token)
