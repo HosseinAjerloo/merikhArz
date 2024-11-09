@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->foreignId('bank_id')->nullable()->constrained('banks')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('siteService_id')->nullable()->constrained('site_services')->cascadeOnUpdate()->cascadeOnDelete();
 
-            $table->integer('service_id_custom')->nullable()->comment('در صورتی پر میشود که کاربر بخواهد از سرویس سفارشی استفاده کند');
+            $table->decimal('service_id_custom',10,1)->nullable()->comment('در صورتی پر میشود که کاربر بخواهد از سرویس سفارشی استفاده کند');
             $table->foreignId('disscount_code_id')->nullable()->constrained('disscount_codes')->cascadeOnUpdate()->cascadeOnDelete();
             $table->bigInteger('final_amount')->nullable();
             $table->integer('time_price_of_dollars')->nullable();

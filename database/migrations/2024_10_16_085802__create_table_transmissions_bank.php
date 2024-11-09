@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transmissions_bank', function (Blueprint $table) {
             $table->id();
-            $table->string('payment_amount')->nullable();
+            $table->decimal('payment_amount',10,1)->nullable();
             $table->string('payment_batch_num')->nullable();
             $table->enum('status',['used','new'])->default('new')->nullable();
             $table->enum('type',['perfectmoney','sainaex'])->default('perfectmoney')->nullable();
