@@ -122,9 +122,9 @@ Route::fallback(function () {
 
 Route::get('test', function () {
 
-    $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
-    $back_price = $client->VerifyTransaction('GmshtyjwKStVZ8dZFEIR6RX/8tJHaU1WE9KGOTz89E', 13660514);
-    dd($back_price);
+//    $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
+//    $back_price = $client->VerifyTransaction('GmshtyjwKStVZ8dZFEIR6RX/8tJHaU1WE9KGOTz89E', 13660514);
+//    dd($back_price);
     $objectBank = \App\Models\Bank::find(2);
     $pyment = new ($objectBank->class);
     $pyment->setTotalPrice(10000);
@@ -133,6 +133,7 @@ Route::get('test', function () {
     $pyment->setBankUrl($objectBank->url);
     $pyment->setBankModel($objectBank);
     $pyment->setUrlBack(route('panel.admin.user.search'));
+    dd($pyment->payment());
     dd($pyment);
 
 

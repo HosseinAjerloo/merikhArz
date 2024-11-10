@@ -290,7 +290,7 @@ class Meli extends Service
 
     public function connectionToBank($token)
     {
-        return redirect()->away($this->getBankUrl() . $token);
+        return redirect()->away('https://sadad.shaparak.ir/VPG/Purchase?Token=' . $token);
     }
 
     public function setBankModel(Bank $bank)
