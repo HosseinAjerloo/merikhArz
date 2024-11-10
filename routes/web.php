@@ -120,30 +120,30 @@ Route::fallback(function () {
 });
 
 
-Route::get('test', function () {
-
-//    $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
-//    $back_price = $client->VerifyTransaction('GmshtyjwKSvw08msisV1/QzlYzQzzNrsw4LA/nnJNC', 13660514);
-//    dd($back_price);
-    $objectBank = \App\Models\Bank::find(2);
-    $pyment = new ($objectBank->class);
-    $pyment->setTotalPrice(10000);
-    $pyment->setOrderID(654894856);
-    $pyment->setTerminalId($objectBank->terminal_id);
-    $pyment->setBankUrl($objectBank->url);
-    $pyment->setBankModel($objectBank);
-    $pyment->setUrlBack(route('meli'));
-    $token=$pyment->payment();
-    return $pyment->connectionToBank($token);
-
-
-
-})->name('test');
-
-
-Route::post('meli',function (\Illuminate\Http\Request $request){
-    dd($request->all(),$request);
-})->name('meli');
+//Route::get('test', function () {
+//
+////    $client = new \SoapClient("https://verify.sep.ir/Payments/ReferencePayment.asmx?WSDL");
+////    $back_price = $client->VerifyTransaction('GmshtyjwKSvw08msisV1/QzlYzQzzNrsw4LA/nnJNC', 13660514);
+////    dd($back_price);
+//    $objectBank = \App\Models\Bank::find(2);
+//    $pyment = new ($objectBank->class);
+//    $pyment->setTotalPrice(10000);
+//    $pyment->setOrderID(654894856);
+//    $pyment->setTerminalId($objectBank->terminal_id);
+//    $pyment->setBankUrl($objectBank->url);
+//    $pyment->setBankModel($objectBank);
+//    $pyment->setUrlBack(route('meli'));
+//    $token=$pyment->payment();
+//    return $pyment->connectionToBank($token);
+//
+//
+//
+//})->name('test');
+//
+//
+//Route::post('meli',function (\Illuminate\Http\Request $request){
+//    dd($request->all(),$request);
+//})->name('meli');
 
 
 
