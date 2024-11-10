@@ -20,6 +20,7 @@ class Meli extends Service
     public function payment()
     {
         $arrres = $this->GetToken();
+        dd($arrres);
         if ($arrres->ResCode == 0) {
             $token = $arrres->Token;
             return $token;
@@ -290,7 +291,7 @@ class Meli extends Service
 
     public function connectionToBank($token)
     {
-        return redirect()->away('https://sadad.shaparak.ir/VPG/Purchase?Token=' . $token);
+        return redirect()->away($this->getBankUrl() . $token);
     }
 
     public function setBankModel(Bank $bank)
