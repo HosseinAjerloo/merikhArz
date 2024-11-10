@@ -132,13 +132,18 @@ Route::get('test', function () {
     $pyment->setTerminalId($objectBank->terminal_id);
     $pyment->setBankUrl($objectBank->url);
     $pyment->setBankModel($objectBank);
-    $pyment->setUrlBack(route('panel.admin.user.search'));
-    dd($pyment->payment());
-    dd($pyment);
+    $pyment->setUrlBack(route('meli'));
+    $token=$pyment->payment();
+    return $pyment->connectionToBank($token);
 
 
 
 })->name('test');
+
+
+Route::post('meli',function (\Illuminate\Http\Request $request){
+    dd($request->all(),$request);
+})->name('meli');
 
 
 
