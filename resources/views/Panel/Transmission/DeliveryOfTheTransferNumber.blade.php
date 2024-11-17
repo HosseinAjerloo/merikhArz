@@ -5,9 +5,12 @@
     <section class="space-y-9">
         <div class="space-y-9 print">
             <div
-                class=" space-x-2 space-x-reverse bg-green-500 text-white p-2 rounded-md font-bold flex items-center justify-center">
+                class=" space-x-2 space-x-reverse bg-green-500 text-white p-2 rounded-md font-bold flex items-center justify-center w-80">
                 <i class="fas fa-check-circle"></i>
-                <p class="text-sm">حواله پرفکت مانی شما با موفقیت انجام شد</p>
+                <p class="text-sm">حواله پرفکت مانی شما با موفقیت انجام شد
+                    کد حواله را کپی کنید و در سایت متقاضی حواله وارد نمائید تا خدمات درخواستی به شما ارائه گردد.
+
+                </p>
             </div>
             <section class=" border-2 border-2-white rounded-md py-3 px-3 text-sm sm:text-base  ">
                 <section class="space-y-3">
