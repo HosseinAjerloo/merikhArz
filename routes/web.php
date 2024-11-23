@@ -130,7 +130,7 @@ Route::get('test',function (){
     $objBank->setTotalPrice(1000000);
     $objBank->setBankModel($bank);
     $status = $objBank->payment();
-    return $objBank->connectionToBank($token);
+    return $objBank->connectionToBank($status);
 
 });
 
