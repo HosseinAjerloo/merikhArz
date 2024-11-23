@@ -20,7 +20,7 @@ class Meli extends Service
     public function payment()
     {
         $arrres = $this->GetToken();
-
+        dd($arrres);
         if ($arrres->ResCode == 0) {
             $token = $arrres->Token;
             return $token;

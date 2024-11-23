@@ -127,9 +127,9 @@ Route::get('test',function (){
     $objBank->setBankUrl($bank->url);
     $objBank->setTerminalId($bank->terminal_id);
     $objBank->setUrlBack(route('panel.transfer.external.back-bank'));
+    $objBank->setTotalPrice(1000000);
     $objBank->setBankModel($bank);
     $status = $objBank->payment();
-    dd($status);
     return $objBank->connectionToBank($token);
 
 });
