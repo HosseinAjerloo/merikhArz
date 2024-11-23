@@ -22,7 +22,7 @@
             مبلغ (تومان) :
         </p>
         <input type="text"
-               class="rounded-md bg-black py-1  border border-white outline-none Desired_amount custom_payment text-gray-400 w-5/6 md:w-4/6"
+               class="rounded-md  py-1  border border-white outline-none Desired_amount custom_payment text-black px-2 w-5/6 md:w-4/6"
                name="price">
 
 
