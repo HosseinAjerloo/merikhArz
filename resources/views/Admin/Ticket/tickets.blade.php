@@ -32,19 +32,19 @@
                     <td class="  text-center py-2">{{$ticket->user->fullName??'-'}}</td>
                     <td class=" text-center py-2 cursor-pointer  "><a
                             href="{{route('panel.admin.ticket-chat',$ticket->id)}}"
-                            class="decoration-2 decoration-sky-500 underline underline-offset-8 text-sky-500 ">{{$ticket->subject}}</a>
+                            class="decoration-2  text-white ">{{$ticket->subject}}</a>
                     </td>
                     <td class="   text-center py-2">{{\Morilog\Jalali\Jalalian::forge($ticket->created_at)->format('Y/m/d H:i:s')}}</td>
                     <td class="   text-center py-2">{{$ticket->ticketStatus()}}</td>
                     @if($ticket->user->type!='admin')
                         <td class=" w-3/12 text-center py-2"><a
-                                class="decoration-2 decoration-sky-500 underline underline-offset-8 text-sky-500"
+                                class="decoration-2  text-white"
                                 href="{{route('panel.admin.login-another-user',$ticket->user_id)}}">وارد شوید</a></td>
                     @else
                         <td class=" w-3/12  text-center py-2 text-sky-500">ادمین</td>
                     @endif
                     <td class="w-3/12   text-center py-2"><a
-                            class="decoration-2 decoration-sky-500 underline underline-offset-8 text-sky-500"
+                            class="decoration-2  text-white"
                             href="{{route('panel.admin.tickets.close',$ticket->id)}}">تغییر وضعیت</a></td>
 
                 </tr>

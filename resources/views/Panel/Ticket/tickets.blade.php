@@ -2,7 +2,7 @@
 
 @section('message-box')
     <h1 class=" border-2 border-2-white rounded-md py-3 px-3 text-sm sm:text-base font-semibold  ">
-        ضمن تشکر از انتخاب <span class="text-sky-500  font-semibold"> ساینا ارز  </span> لطفا مشکل خود را بیان کنید تا در اسرع وقت کارشناسان ما مشکل شما را بر طرف کنند.
+        ضمن تشکر از انتخاب <span class="text-white  font-semibold"> ساینا ارز  </span> لطفا مشکل خود را بیان کنید تا در اسرع وقت کارشناسان ما مشکل شما را بر طرف کنند.
     </h1>
 @endsection
 
@@ -27,7 +27,7 @@
             @foreach($tickets as $key=> $ticket)
                 <tr class=" py-6 text-black text-sm sm:text-base">
                     <td class=" w-1/3  text-center py-2">{{$key+1}}</td>
-                    <td class=" w-1/3 text-center py-2 cursor-pointer  "><a href="{{route('panel.ticket-chat',$ticket->id)}}" class="decoration-2 decoration-sky-500 underline underline-offset-8 text-sky-500 ">{{$ticket->subject}}</a></td>
+                    <td class=" w-1/3 text-center py-2 cursor-pointer  "><a href="{{route('panel.ticket-chat',$ticket->id)}}" class="decoration-2   text-white ">{{$ticket->subject}}</a></td>
                     <td class=" w-1/3  text-center py-2">{{\Morilog\Jalali\Jalalian::forge($ticket->created_at)->format('Y/m/d H:i:s')}}</td>
                     <td class=" w-1/3  text-center py-2">{{$ticket->ticketStatus()}}</td>
                 </tr>
