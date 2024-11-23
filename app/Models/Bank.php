@@ -25,13 +25,13 @@ class Bank extends Model
         [
             'name'=>'درگاه پرداخت بانک ملی',
             'url'=>'https://sadad.shaparak.ir/VPG/Purchase?Token=',
-            'terminal_id'=>17992390,
+            'terminal_id'=>24110238,
             'description'=>'درگاه پرداخت بانک ملی',
             'is_active'=>1,
             'logo_url'=>'src/images/meliBank.png',
             'class'=>'\App\Services\BankService\Meli',
-            'password'=>'sqagJ37wARJ5R+84sphCpRDuSDc+IieG',
-            'username'=>'000000116034257',
+            'password'=>'9uV4rqRl+0nQUs5Dg/DNTkwBVEYq3FgS',
+            'username'=>'000000140346726',
 
         ]
     ];

@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Models\Payment;
 use App\Models\Role;
 use App\Models\Transmission;
 use App\Models\VouchersBank;
@@ -117,6 +118,20 @@ Route::prefix('admin')->middleware(['auth', 'AdminLogin'])->group(function () {
 
 Route::fallback(function () {
     abort(404);
+});
+
+Route::get('test',function (){
+    $bank=\App\Models\Bank::find(2);
+    $objBank=new ($bank->class);
+    $objBank->setOrderID(10000);
+    $objBank->setBankUrl($bank->url);
+    $objBank->setTerminalId($bank->terminal_id);
+    $objBank->setUrlBack(route('panel.transfer.external.back-bank'));
+    $objBank->setBankModel($bank);
+    $status = $objBank->payment();
+    dd($status);
+    return $objBank->connectionToBank($token);
+
 });
 
 
