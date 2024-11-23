@@ -1,5 +1,5 @@
 @include('Auth.Layout.heade')
-<body class="font-yekan bg-gray-950 text-white">
+<body class="font-yekan bg-gradient-to-t to-white-500 from-sky-500 text-white">
 @include('Auth.Layout.header')
 @yield('header-tag')
 @include('Auth.Layout.script')

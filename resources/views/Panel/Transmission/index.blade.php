@@ -24,7 +24,7 @@
 @section('container')
     <article class="px-3 py-6">
         <form action="{{route('panel.transmission')}}" method="post"
-              class="form relative flex justify-between items-center border-2 border-white rounded-md  flex-wrap  p-5 text-center  mx-auto md:w-2/3 lg:w-4/6 after:content-['انتخاب_سریع'] after:absolute after:text-white after:top-[-15px] after:bg-gray-950 after:px-4 sm:after:text-sm after:text-base">
+              class="form relative flex justify-between items-center border-2 border-white rounded-md  flex-wrap  p-5 text-center  mx-auto md:w-2/3 lg:w-4/6 after:content-['انتخاب_سریع'] after:absolute after:text-white after:top-[-15px] after:bg-transparent after:backdrop-blur-3xl after:rounded-md after:px-4 sm:after:text-sm after:text-base">
             @csrf
             @foreach($services as $service)
                 <label for="dollar-{{$service->id}}" data-inputID="{{$service->id}}"

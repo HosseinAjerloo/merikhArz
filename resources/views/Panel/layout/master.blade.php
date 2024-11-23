@@ -1,5 +1,5 @@
 @include('Panel.layout.head')
-<body class="font-yekan text-white bg-gray-950  overflow-x-hidden relative before:absolute before:content-[''] before:top-[5rem] before:left-[8rem] before:blur-3xl before:z-[-1] before:w-[32rem] before:h-[32rem]  bg-gradient-to-b from-sky-600  to-white-500  ">
+<body class="font-yekan text-white bg-gray-950  overflow-x-hidden  bg-gradient-to-t to-white-500 from-sky-500       ">
 @include('Panel.layout.header')
 @yield('header-tag')
 @include('Panel.layout.script')

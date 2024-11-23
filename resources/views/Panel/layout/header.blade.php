@@ -10,7 +10,7 @@
 
     </a>
     <div class="myProfile cursor-pointer">
-        <img src="{{asset('src/images/paneLUserIcon.png')}}" alt="">
+        <img src="{{asset('src/images/paneLUserIcon.svg')}}" alt="">
     </div>
 
     <section id="menu"
