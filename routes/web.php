@@ -126,7 +126,7 @@ Route::get('test',function (){
     $objBank->setOrderID(10000);
     $objBank->setBankUrl($bank->url);
     $objBank->setTerminalId($bank->terminal_id);
-    $objBank->setUrlBack(route('panel.transfer.external.back-bank'));
+    $objBank->setUrlBack(route('panel.back.transferFromThePaymentGateway'));
     $objBank->setTotalPrice(1000000);
     $objBank->setBankModel($bank);
     $status = $objBank->payment();
