@@ -279,7 +279,7 @@
 
 
         function formatNumber(number) {
-            number=Math.floor(number)
+            number=Math.floor(number/10000)*10000
             let string = number.toLocaleString('fa-IR'); // ۱۲٬۳۴۵٫۶۷۹
             number = string.replace(/\٬/g, ",‬");
             return number;

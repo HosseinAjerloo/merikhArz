@@ -59,7 +59,7 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
+                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $service->amount) /10000 )*10000);
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
                 }
@@ -109,8 +109,7 @@ class TransmissionController extends Controller
 
             } elseif (isset($inputs['custom_payment'])) {
 
-                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
-
+                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
                 }
@@ -183,10 +182,12 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $service->amount);
+                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $service->amount) /10000 )*10000);
+
             } elseif (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
+                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
+
             } else {
                 return redirect()->route('panel.transmission.view')->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
@@ -453,7 +454,8 @@ class TransmissionController extends Controller
 
             if (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice = floor($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']);
+                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
+
             } else {
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
