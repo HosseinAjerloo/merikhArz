@@ -121,6 +121,7 @@ Route::fallback(function () {
 });
 
 Route::get('test',function (){
+    dd('hossein');
     $bank=\App\Models\Bank::find(2);
     $objBank=new ($bank->class);
     $objBank->setOrderID(10000);
