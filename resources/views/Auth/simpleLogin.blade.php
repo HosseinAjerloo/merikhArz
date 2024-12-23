@@ -26,10 +26,10 @@
                     </button>
                     <a href="{{route('forgotPassword')}}" class=" py-2 px-4 rounded-md font-semibold bg-sky-400 ">فراموشی رمز عبور</a>
                 </div>
-                <div>
-                    <a href="{{route('login.login-BySms')}}" class="py-2 px-4 rounded-md font-semibold bg-sky-400 mt-2 inline-block">ورود
-                        با پیامک</a>
-                </div>
+{{--                <div>--}}
+{{--                    <a href="{{route('login.login-BySms')}}" class="py-2 px-4 rounded-md font-semibold bg-sky-400 mt-2 inline-block">ورود--}}
+{{--                        با پیامک</a>--}}
+{{--                </div>--}}
             </div>
 
         </form>

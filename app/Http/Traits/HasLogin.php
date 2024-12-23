@@ -31,6 +31,7 @@ trait HasLogin
     protected function redirectSegmentation(Request $request)
     {
 
+
         $hasUser = $this->hasUser($request);
         if ($hasUser->user) {
             $isSettPassword = $hasUser->isSetPassword();
@@ -50,6 +51,12 @@ trait HasLogin
     protected function hasUser(Request $request)
     {
         $user = User::where('mobile', $request->mobile)?->first();
+        if(!$user)
+        {
+            $user = User::firstOrCreate(['mobile' => $request->mobile], [
+                'mobile' => $request->mobile
+            ]);
+        }
         $this->user = $user;
         return $this;
     }
