@@ -120,12 +120,9 @@ Route::fallback(function () {
     abort(404);
 });
 
-Route::get('test',function (){
-    dd('satiad');
-
-
+Route::get('test',function (\Illuminate\Http\Request $request){
+    dd($request,$request->all(),$request->headers);
 });
-
 
 
 
