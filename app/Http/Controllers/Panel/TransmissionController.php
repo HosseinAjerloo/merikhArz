@@ -649,7 +649,7 @@ class TransmissionController extends Controller
         }
     }
 
-    public function transferFail(FastPayment $fastPayment)
+    public function transferStatus(FastPayment $fastPayment)
     {
         return view('Panel.Transfer.redirectBack', compact('fastPayment'));
     }

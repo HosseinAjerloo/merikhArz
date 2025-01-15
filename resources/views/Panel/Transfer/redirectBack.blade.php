@@ -6,18 +6,18 @@
         <div class="space-y-9 print">
             <div
                 class=" space-x-2 space-x-reverse bg-rose-500 text-white p-2 rounded-md font-bold flex items-center justify-center">
-                @if($fastPayment->financeTransaction->status!='saccess')
+                @if($fastPayment->financeTransaction->payment!='finished')
                 <i class="fas fa-close text-white"></i>
                 @endif
                 <p class="text-sm sm:text-base">
-                    @if($fastPayment->financeTransaction->status!='saccess')
+                    @if($fastPayment->financeTransaction->payment!='finished')
                         متاسفانه پرداخت شما با خطا مواجه شده است
                     @else
                         پرداخت موفقیت آمیز بود شما میتوانید از قسمت سوابق تراکنش های خود را مشاهده کنید
                     @endif
                 </p>
             </div>
-            @if($fastPayment->financeTransaction->status!='saccess')
+            @if($fastPayment->financeTransaction->payment!='finished')
 
                 <section class=" border-2 border-2-white rounded-md py-3 px-3 text-sm sm:text-base space-y-3 ">
                     <div class=" flex items-center space-x-3 space-x-reverse">
