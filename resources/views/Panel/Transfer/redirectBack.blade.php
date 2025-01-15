@@ -38,7 +38,7 @@
 
             <div
                 class="bg-rose-500 w-full rounded-md font-semibold py-1 w-1/3 flex items-center justify-center cursor-pointer">
-                <a href="{{$fastPayment->url_back}}/{{$fastPayment->pay_id}}" class="text-sm">بازگشت به سایت پذیرنده</a>
+                <a href="{{$fastPayment->url_back}}" class="text-sm">بازگشت به سایت پذیرنده</a>
             </div>
 
 

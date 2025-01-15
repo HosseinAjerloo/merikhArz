@@ -644,7 +644,7 @@ class TransmissionController extends Controller
 
         } catch (\Exception $e) {
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
-            SendAppAlertsJob::dispatch('در انتقال ووچر از درگاه باتکی خطایی رخ داده است لطفا پیگیری شود.')->onQueue('perfectmoney');
+            SendAppAlertsJob::dispatch('در پرداخت سریع از درگاه باتکی خطایی رخ داده است لطفا پیگیری شود.')->onQueue('perfectmoney');
             return redirect()->route('panel.transfer.external')->withErrors(['error' => 'یک خطای غیر منتظره رخ داد لفطا از طریق پشتیبانی تیکت برنید']);
         }
     }

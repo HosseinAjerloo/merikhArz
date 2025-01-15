@@ -31,7 +31,6 @@ Route::middleware('guest')->group(function () {
 });
 Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::post('verify-fastPayment', [App\Http\Controllers\Panel\TransmissionController::class, 'VerifyFastPayment'])->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)->name('panel.verify.fast.payment');
 
 Route::middleware(['auth'])->group(function () {
     Route::withoutMiddleware('IsEmptyUserInformation')->group(function () {
