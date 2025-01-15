@@ -42,6 +42,10 @@ class FinanceTransaction extends Model
     {
         $query->select('user_id')->distinct()->orderBy('user_id','asc')->whereDate('created_at',">=",$date)->limit(10);
     }
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class,'payment_id');
+    }
 
 
 }

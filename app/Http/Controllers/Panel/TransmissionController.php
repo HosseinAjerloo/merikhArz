@@ -31,11 +31,13 @@ use function Termwind\ask;
 class TransmissionController extends Controller
 {
     use HasConfig;
+
     protected $inputsConfig;
+
     public function __construct()
     {
         $this->inputsConfig = $this;
-        $this->inputsConfig->type='perfectmoney';
+        $this->inputsConfig->type = 'perfectmoney';
     }
 
     public function index()
@@ -60,7 +62,7 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $service->amount) /10000 )*10000);
+                $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $service->amount) / 10000) * 10000);
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
                 }
@@ -110,7 +112,7 @@ class TransmissionController extends Controller
 
             } elseif (isset($inputs['custom_payment'])) {
 
-                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
+                $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) / 10000) * 10000);
                 if ($voucherPrice > $balance) {
                     return redirect()->route('panel.transmission.view')->withErrors(['Low_inventory' => "موجودی کیف پول شما کافی نیست"]);
                 }
@@ -183,11 +185,11 @@ class TransmissionController extends Controller
 
             if (isset($inputs['service_id'])) {
                 $service = Service::find($inputs['service_id']);
-                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $service->amount) /10000 )*10000);
+                $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $service->amount) / 10000) * 10000);
 
             } elseif (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
+                $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) / 10000) * 10000);
 
             } else {
                 return redirect()->route('panel.transmission.view')->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
@@ -219,7 +221,6 @@ class TransmissionController extends Controller
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.back.transferFromThePaymentGateway'));
             $objBank->setBankModel($bank);
-
 
 
             $status = $objBank->payment();
@@ -301,7 +302,7 @@ class TransmissionController extends Controller
             }
             $back_price = $objBank->verify($payment->amount);
 
-            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+            if ($back_price !== true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
 
                 $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->verifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
@@ -428,8 +429,7 @@ class TransmissionController extends Controller
             if (!$validation->fails()) {
                 session()->put('transfer', $request->getUri());
                 $dollar = Doller::orderBy('id', 'desc')->first();
-                $inputs['rial'] = $dollar->DollarRateWithAddedValue() * $inputs['amount'];
-                $inputs['rial'] = (int)floor($inputs['rial']);
+                $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
                 $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
@@ -457,11 +457,11 @@ class TransmissionController extends Controller
 
             if (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
-                $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
+                $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) / 10000) * 10000);
 
             } else {
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
-                ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
+                    , 'pay_id' => $inputs['pay_id'], 'url_back' => $inputs['url_back']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
 
             $inputs['final_amount'] = $voucherPrice;
@@ -486,14 +486,12 @@ class TransmissionController extends Controller
             );
 
 
-
             $payment->update(['order_id' => $payment->id + Payment::transactionNumber]);
             $objBank->setOrderID($payment->id + Payment::transactionNumber);
             $objBank->setBankUrl($bank->url);
             $objBank->setTerminalId($bank->terminal_id);
             $objBank->setUrlBack(route('panel.transfer.external.back-bank'));
             $objBank->setBankModel($bank);
-
 
 
             $status = $objBank->payment();
@@ -505,13 +503,13 @@ class TransmissionController extends Controller
                 'description' => " ارتباط با بانک $bank->name",
                 'payment_id' => $payment->id,
             ]);
-            $fastPayment=FastPayment::create([
-                'invoice_id'=>$invoice->id,
-                'amount'=>$inputs['custom_payment'],
-                'account'=>$inputs['transmission'],
-                'pay_id'=>$inputs['pay_id'],
-                'url_back'=>$inputs['url_back'],
-                'finance_id'=>$financeTransaction->id
+            $fastPayment = FastPayment::create([
+                'invoice_id' => $invoice->id,
+                'amount' => $inputs['custom_payment'],
+                'account' => $inputs['transmission'],
+                'pay_id' => $inputs['pay_id'],
+                'url_back' => $inputs['url_back'],
+                'finance_id' => $financeTransaction->id
             ]);
 
             if (!$status) {
@@ -519,7 +517,7 @@ class TransmissionController extends Controller
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
-                    ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                    , 'pay_id' => $inputs['pay_id'], 'url_back' => $inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
             $token = $status;
             session()->put('transmission', $inputs['transmission']);
@@ -545,7 +543,7 @@ class TransmissionController extends Controller
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
 
             return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
-                ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                , 'pay_id' => $inputs['pay_id'], 'url_back' => $inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
 
@@ -585,13 +583,13 @@ class TransmissionController extends Controller
                 $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
                 $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                return redirect()->route('panel.transfer.external.redirect',$fastPayment)->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
+                return redirect()->route('panel.transfer.external.redirect', $fastPayment)->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
             }
 
 
             $back_price = $objBank->verify($payment->amount);
 
-            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+            if ($back_price !== true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
 
                 $bankErrorMessage = "درگاه بانک سامان تراکنش شمارا به دلیل " . $objBank->verifyTransaction($back_price) . " ناموفق اعلام کرد باتشکر سایناارز" . PHP_EOL . 'پشتیبانی بانک سامان' . PHP_EOL . '021-6422';
                 $satiaService->send($bankErrorMessage, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
@@ -616,33 +614,32 @@ class TransmissionController extends Controller
                 ]);
 
 
-
             $invoice->update(['status' => 'finished']);
 
-                $financeTransaction->update([
-                    'user_id' => $user->id,
-                    'amount' => $payment->amount,
-                    'type' => "deposit",
-                    "creadit_balance" => $balance + $payment->amount,
-                    'description' => ' افزایش کیف پول',
-                    'payment_id' => $payment->id,
-                    'time_price_of_dollars' => $dollar->DollarRateWithAddedValue()
-                ]);
+            $financeTransaction->update([
+                'user_id' => $user->id,
+                'amount' => $payment->amount,
+                'type' => "deposit",
+                "creadit_balance" => $balance + $payment->amount,
+                'description' => ' افزایش کیف پول',
+                'payment_id' => $payment->id,
+                'time_price_of_dollars' => $dollar->DollarRateWithAddedValue()
+            ]);
 
-                $finance = FinanceTransaction::create([
-                    'user_id' => $user->id,
-                    'amount' => $payment->amount,
-                    'type' => "withdrawal",
-                    "creadit_balance" => $financeTransaction->creadit_balance - $payment->amount,
-                    'description' => 'پرداخت سریع از کیف پول',
-                    'payment_id' => $payment->id,
-                    'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
-                ]);
+            $finance = FinanceTransaction::create([
+                'user_id' => $user->id,
+                'amount' => $payment->amount,
+                'type' => "withdrawal",
+                "creadit_balance" => $financeTransaction->creadit_balance - $payment->amount,
+                'description' => 'پرداخت سریع از کیف پول',
+                'payment_id' => $payment->id,
+                'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
+            ]);
 
 
-                $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
-                $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
-                return redirect()->route('panel.transfer.external.redirect', $fastPayment);
+            $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+            $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
+            return redirect()->route('panel.transfer.external.redirect', $fastPayment);
 
 
         } catch (\Exception $e) {
@@ -651,8 +648,35 @@ class TransmissionController extends Controller
             return redirect()->route('panel.transfer.external')->withErrors(['error' => 'یک خطای غیر منتظره رخ داد لفطا از طریق پشتیبانی تیکت برنید']);
         }
     }
+
     public function transferFail(FastPayment $fastPayment)
     {
-        return view('Panel.Transfer.redirectBack',compact('fastPayment'));
+        return view('Panel.Transfer.redirectBack', compact('fastPayment'));
     }
+
+    public function VerifyFastPayment(Request $request)
+    {
+        if ($request->header('token')==env('SAINAEX_TOKEN') and $request->has('pay_id'))
+        {
+            $fastPayment=FastPayment::where('pay_id',$request->pay_id)->latest()->first();
+           if ($fastPayment)
+           {
+               if ($fastPayment->financeTransaction->payment)
+               {
+                   $success=($fastPayment->financeTransaction->payment->state)!='finished'?false:true;
+                   return response()->json(['success'=>$success,'message'=>$fastPayment->financeTransaction->description,'amount'=>$fastPayment->amount]);
+               }
+               else{
+                   return response()->json(['success'=>false,'message'=>'پرداخت یافت نشد']);
+               }
+           }
+           else{
+               return response()->json(['success'=>false,'message'=>'رکورد یافت نشد']);
+           }
+        }
+        else{
+            return response()->json(['success'=>false,'message'=>'رکورد یافت نشد']);
+        }
+    }
+
 }
