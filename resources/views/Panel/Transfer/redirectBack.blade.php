@@ -6,10 +6,14 @@
         <div class="space-y-9 print">
             <div
                 class=" space-x-2 space-x-reverse bg-rose-500 text-white p-2 rounded-md font-bold flex items-center justify-center">
+                @if($fastPayment->financeTransaction->status!='saccess')
                 <i class="fas fa-close text-white"></i>
+                @endif
                 <p class="text-sm sm:text-base">
                     @if($fastPayment->financeTransaction->status!='saccess')
                         متاسفانه پرداخت شما با خطا مواجه شده است
+                    @else
+                        پرداخت موفقیت آمیز بود شما میتوانید از قسمت سوابق تراکنش های خود را مشاهده کنید
                     @endif
                 </p>
             </div>
