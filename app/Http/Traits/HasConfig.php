@@ -138,10 +138,14 @@ trait HasConfig
         return Validator::make(request()->all(),
             [
                 'amount' => ['required', 'numeric', "max:" . env('Daily_Purchase_Limit'), 'min:0.1', new DecimalRule()],
-                'account' => ["required", "min:9", "max:9", new PAYERACCOUNTRule()]
+                'account' => ["required", "min:9", "max:9", new PAYERACCOUNTRule()],
+                'pay_id' => ["required"],
+                'url_back' => ["required"],
             ],
             [
                 'amount.required' => 'وارد کردن مبلغ حواله الزامی است',
+                'url_back.required' => 'آدرس پذیرنده الزامی است',
+                'pay_id.required' => 'شماره فاکتور نامعتبر میباشد',
                 'amount.numeric' => 'مبلغ حواله باید به صورت عددی باشد',
                 'amount.max' => 'مبلغ حواله نباید بزرگ تر از 20 باشد',
                 'amount.min' => 'مبلغ حواله نباید کوچک  تر از 1 باشد',

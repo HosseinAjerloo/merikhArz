@@ -10,6 +10,7 @@ use App\Http\Traits\HasConfig;
 use App\Jobs\SendAppAlertsJob;
 use App\Models\Bank;
 use App\Models\Doller;
+use App\Models\FastPayment;
 use App\Models\FinanceTransaction;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -420,6 +421,8 @@ class TransmissionController extends Controller
 //            $siteService = SiteService::find(1);
             $request->request->add(['amount' => $request->get('amount')]);
             $request->request->add(['account' => $request->get('account')]);
+            $request->request->add(['pay_id' => $request->get('pay_id')]);
+            $request->request->add(['url_back' => $request->get('url_back')]);
             $validation = $this->transferValidation();
             $inputs = $request->all();
             if (!$validation->fails()) {
@@ -457,15 +460,16 @@ class TransmissionController extends Controller
                 $voucherPrice =( floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) /10000 )*10000);
 
             } else {
-                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
+                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
+                ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
 
             $inputs['final_amount'] = $voucherPrice;
-            $inputs['type'] = 'transmission';
+            $inputs['type'] = 'fastPayment';
             $inputs['status'] = 'requested';
             $inputs['bank_id'] = $bank->id;
             $inputs['time_price_of_dollars'] = $dollar->DollarRateWithAddedValue();
-            $inputs['description'] = ' انتقال حواله پرفکت مانی از طریق ' . $bank->name;
+            $inputs['description'] = ' پرداخت سریع حواله از طریق ' . $bank->name;
 
 
             $invoice = Invoice::create($inputs);
@@ -480,6 +484,9 @@ class TransmissionController extends Controller
 
                 ]
             );
+
+
+
             $payment->update(['order_id' => $payment->id + Payment::transactionNumber]);
             $objBank->setOrderID($payment->id + Payment::transactionNumber);
             $objBank->setBankUrl($bank->url);
@@ -498,16 +505,27 @@ class TransmissionController extends Controller
                 'description' => " ارتباط با بانک $bank->name",
                 'payment_id' => $payment->id,
             ]);
+            $fastPayment=FastPayment::create([
+                'invoice_id'=>$invoice->id,
+                'amount'=>$inputs['custom_payment'],
+                'account'=>$inputs['transmission'],
+                'pay_id'=>$inputs['pay_id'],
+                'url_back'=>$inputs['url_back'],
+                'finance_id'=>$financeTransaction->id
+            ]);
+
             if (!$status) {
-                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال حواله پرفکت مانی  شما لغو شد "]);
+                $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name پرداخت سریع  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
-                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
+                    ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
             $token = $status;
             session()->put('transmission', $inputs['transmission']);
             session()->put('payment', $payment->id);
             session()->put('financeTransaction', $financeTransaction->id);
+            session()->put('fastPayment', $fastPayment->id);
             Log::channel('bankLog')->emergency(PHP_EOL . 'Connect to the bank to transfer the voucher '
                 . PHP_EOL .
                 'Name of the bank: ' . $bank->name
@@ -525,7 +543,8 @@ class TransmissionController extends Controller
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
 
-            return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+            return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
+                ,'pay_id'=>$inputs['pay_id'],'url_back'=>$inputs['url_back']])->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
 
@@ -540,6 +559,7 @@ class TransmissionController extends Controller
             $inputs = $request->all();
             $payment = Payment::find(session()->get('payment'));
             $financeTransaction = FinanceTransaction::find(session()->get('financeTransaction'));
+            $fastPayment = FinanceTransaction::find(session()->get('fastPayment'));
 
             $bank = $payment->bank;
             $objBank = new $bank->class;
@@ -564,7 +584,7 @@ class TransmissionController extends Controller
                 $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus()]);
                 $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->transactionStatus(), 'status' => 'fail']);
 
-                return redirect()->route('panel.transfer.external')->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
+                return redirect()->route('panel.transfer.external.redirect',$fastPayment)->withErrors(['error' => 'پرداخت موفقیت آمیز نبود' . $objBank->transactionStatus()]);
             }
 
 
@@ -584,7 +604,7 @@ class TransmissionController extends Controller
                     'user Id: ' . $user->id
                     . PHP_EOL
                 );
-                return redirect()->route('panel.error', $payment->id);
+                return redirect()->route('panel.transfer.external.redirect', $fastPayment);
             }
 
             $payment->update(
@@ -594,17 +614,9 @@ class TransmissionController extends Controller
                     'state' => 'finished'
                 ]);
 
-            if (isset($invoice->service_id)) {
-                $service = $invoice->service;
-                $amount = $service->amount;
-            } else {
-                $amount = $invoice->service_id_custom;
-            }
 
 
-            $transition = $this->transmission(session()->get('transmission'), $amount);
             $invoice->update(['status' => 'finished']);
-            if (is_array($transition)) {
 
                 $financeTransaction->update([
                     'user_id' => $user->id,
@@ -621,49 +633,25 @@ class TransmissionController extends Controller
                     'amount' => $payment->amount,
                     'type' => "withdrawal",
                     "creadit_balance" => $financeTransaction->creadit_balance - $payment->amount,
-                    'description' => 'انتقال ووچر و برداشت مبلغ از کیف پول',
+                    'description' => 'پرداخت سریع از کیف پول',
                     'payment_id' => $payment->id,
                     'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
                 ]);
 
-                $transitionDelivery = Transmission::create(
-                    [
-                        'user_id' => $user->id,
-                        'finance_id' => $finance->id,
-                        'payee_account_name' => $transition['Payee_Account_Name'],
-                        'invoice_id' => $invoice->id,
-                        'payee_account' => $transition['Payee_Account'],
-                        'payer_account' => $transition['Payer_Account'],
-                        'payment_amount' => $transition['PAYMENT_AMOUNT'],
-                        'payment_batch_num' => $transition['PAYMENT_BATCH_NUM'],
-                        'type' => $this->inputsConfig ? $this->inputsConfig->type : 'perfectmoney'
 
-                    ]
-                );
-                $message = "سلام انتقال حواله پرفکت مانی انجام شد اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+                $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
                 $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
-                return redirect()->route('panel.transfer.information', $transitionDelivery);
+                return redirect()->route('panel.transfer.external.redirect', $fastPayment);
 
-            } else {
-                $invoice->update(['status' => 'finished', 'description' => 'پرداخت با موفقیت انجام شد به دلیل عدم ارتباط با پرفکت مانی مبلغ کیف پول شما افزایش داده شد و شما میتوانید در یک ساعت آینده از کیف پول خود جهت انتقال ووچر اقدام نمایید']);
 
-                $financeTransaction->update([
-                    'user_id' => $user->id,
-                    'voucher_id' => null,
-                    'amount' => $payment->amount,
-                    'type' => "deposit",
-                    "creadit_balance" => $balance + $payment->amount,
-                    'description' => 'پرداخت با موفقیت انجام شد به دلیل عدم ارتباط با پرفکت مانی مبلغ کیف پول شما افزایش داده شد و شما میتوانید در یک ساعت آینده از کیف پول خود جهت انتقال ووچر اقدام نمایید',
-                    'payment_id' => $payment->id,
-                    'time_price_of_dollars' => $dollar->DollarRateWithAddedValue()
-
-                ]);
-                return redirect()->route('panel.transfer.fail');
-            }
         } catch (\Exception $e) {
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در انتقال ووچر از درگاه باتکی خطایی رخ داده است لطفا پیگیری شود.')->onQueue('perfectmoney');
             return redirect()->route('panel.transfer.external')->withErrors(['error' => 'یک خطای غیر منتظره رخ داد لفطا از طریق پشتیبانی تیکت برنید']);
         }
+    }
+    public function transferFail(FastPayment $fastPayment)
+    {
+        return view('Panel.Transfer.redirectBack',compact('fastPayment'));
     }
 }

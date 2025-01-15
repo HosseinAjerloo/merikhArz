@@ -25,8 +25,9 @@ class TransferRequest extends FormRequest
     {
         return [
             "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:0.1',new DecimalRule()],
-
             "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()],
+            "url_back"=>'required',
+            "pay_id"=>'required',
         ];
     }
     public function messages(): array
@@ -35,6 +36,8 @@ class TransferRequest extends FormRequest
             'custom_payment.required'=>'وارد کردن مبلغ کارت هدیه پرفکت مانی الزامی است',
             'siteService.required'=>'پذیرنده نامعتبر است',
             'siteService.exists'=>'پذیرنده نامعتبر است',
+            'url_back.required'=>'آدرس پذیرنده الزامی است',
+            'pay_id.required'=>'شماره فاکتور الزامی است',
         ];
     }
 }
