@@ -1,4 +1,4 @@
-<header class="bg-sky-500 py-3 px-2 flex items-center justify-between relative">
+<header class="bg-sky-900 py-3 px-2 flex items-center justify-between relative">
     <div class="menuHamburger cursor-pointer">
         <img src="{{asset('src/images/hamburger.svg')}}" alt="">
     </div>
