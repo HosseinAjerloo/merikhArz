@@ -93,6 +93,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('download/{file}', [App\Http\Controllers\Panel\TicketController::class, 'download'])->name('panel.ticket.download');
     Route::get('faq', [App\Http\Controllers\Panel\FaqController::class, 'index'])->name('panel.faq');
 
+    Route::get('payment-service-register',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register'])->name('panel.payment-service-register');
+    Route::post('payment-service-register-submit',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register_submit'])->name('panel.payment-service-register-submit');
 });
 
 // Admin
@@ -116,6 +118,7 @@ Route::prefix('admin')->middleware(['auth', 'AdminLogin'])->group(function () {
     });
 });
 
+Route::view('payment-service', 'Pages.payment-service')->name('payment-service');
 
 Route::fallback(function () {
     abort(404);
