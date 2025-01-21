@@ -13,7 +13,7 @@
                 برای استفاده از این درگاه باید طبق دستور زیر عمل نمایید :
             </p>
             <ul class="list-decimal">
-                <li>وارد پنل شده و <a href="" class="bg-sky-500 border rounded-2xl shadow-purple-950 p-1">ثبت نام</a> فروشگاه برای درگاه رمز ارزی را انجام بدهید</li>
+                <li>وارد پنل شده و <a href="{{route('panel.payment-service-register')}}" class="bg-sky-500 border rounded-2xl shadow-purple-950 p-1">ثبت نام</a> فروشگاه برای درگاه رمز ارزی را انجام بدهید</li>
                 <li>
                     <p>طبق ساختار زیر درخواست خود را به ساینا ارز ارسال نمایید </p>
                     <p>https://sainaex.ir/transfer?amount=<span class="text-purple-950">amount</span>&pay_id=<span class="text-purple-950">pay_id</span>

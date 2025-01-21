@@ -62,6 +62,12 @@
                 </div>
                 <p class="text-sm sm:text-base">پشتیبانی</p>
             </a>
+            <a href="{{route('panel.payment-service-register')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
+                <div class="border-black border-2 rounded-full p-4 box-border">
+                    <img src="{{asset('src/images/dargah.svg')}}" alt="">
+                </div>
+                <p class="text-sm sm:text-base">توسعه دهندگان</p>
+            </a>
             @if(\Illuminate\Support\Facades\Auth::user()->type=='admin')
 
             <a href="{{route('panel.admin')}}"  class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
