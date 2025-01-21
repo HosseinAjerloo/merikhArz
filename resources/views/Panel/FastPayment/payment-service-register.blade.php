@@ -66,11 +66,11 @@
             <button class="flex items-center justify-start bg-sky-500 rounded-md cursor-pointer py-2 px-4" type="submit">
                 <span>ثبت درخواست</span>
             </button>
-            <a href="{{route('panel.index')}}" class="block bg-red-600 rounded-md py-2 px-4">
+            <a href="{{route('panel.index')}}" class="block bg-rose-800 rounded-md py-2 px-4">
                 <span>بازگشت به صفحه اصلی</span>
             </a>
         </div>
-        <a href="{{route('payment-service')}}" class="block bg-red-600 rounded-md py-2 px-4">
+        <a href="{{route('payment-service')}}" class="block  bg-sky-700 rounded-md py-2 px-4">
             <span>آموزش استفاده از درگاه رمز ارزی</span>
         </a>
     </form>
