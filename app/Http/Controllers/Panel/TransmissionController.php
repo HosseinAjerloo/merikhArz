@@ -17,6 +17,7 @@ use App\Models\Payment;
 use App\Models\Service;
 use App\Models\SiteService;
 use App\Models\Transmission;
+use App\Models\User;
 use App\Models\Voucher;
 use App\Services\SmsService\SatiaService;
 use Carbon\Carbon;
@@ -431,6 +432,11 @@ class TransmissionController extends Controller
                 $dollar = Doller::orderBy('id', 'desc')->first();
                 $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
                 $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
+                $inputs['amount'] =(floor(($dollar->amount_to_rials * $inputs['amount']) / 10000) * 10000);
+                $inputs['amount'] = numberFormat(substr($inputs['amount'], 0, strlen($inputs['amount']) - 1));
+                $inputs['Commission'] =(ceil(($dollar->amount_to_rials * Doller::Commission)/100));
+                $inputs['Commission'] =(floor(( $inputs['Commission']) / 10000) * 10000);
+                $inputs['Commission'] = numberFormat(substr($inputs['Commission'], 0, strlen($inputs['Commission']) - 1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
             return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
@@ -446,11 +452,18 @@ class TransmissionController extends Controller
     public function transferConnectionBank(TransferRequest $request)
     {
         try {
-            $balance = Auth::user()->getCreaditBalance();
-
+            $inputs = $request->all();
+            $user =  User::firstOrCreate([
+                'mobile' => $inputs['mobile']
+            ]);
+            if (!Auth::hasUser())
+            {
+                Auth::loginUsingId($user->id);
+            }
+            $balance = $user->getCreaditBalance();
             $dollar = Doller::orderBy('id', 'desc')->first();
             $inputs = $request->all();
-            $user = Auth::user();
+
             $bank = Bank::where('is_active', 1)->first();
             $inputs['user_id'] = $user->id;
             $inputs['description'] = " انتقال ووچر از طریق $bank->name";

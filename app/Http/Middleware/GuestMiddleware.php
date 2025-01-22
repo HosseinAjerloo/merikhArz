@@ -19,7 +19,7 @@ class GuestMiddleware
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-
+//        dd(Auth::hasUser());
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
