@@ -19,7 +19,7 @@
                 <div class="rounded-md  text-black border border-black border-dashed py-2 px-4 mt-5">
                     <div class=" flex items-center justify-between text-min  leading-6">
                         <span>قیمت به تومان:</span>
-                        <span>{{$inputs['amount']??''}} تومان</span>
+                        <span>{{$inputs['amount_rial']??''}} تومان</span>
                     </div>
                     <div class=" flex items-center justify-between text-min  leading-6">
                         <span>کارمزد حواله:</span>
