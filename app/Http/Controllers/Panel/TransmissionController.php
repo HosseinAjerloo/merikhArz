@@ -418,9 +418,8 @@ class TransmissionController extends Controller
 
     public function transfer(Request $request)
     {
-//        try {
-//            SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();
-//            $siteService = SiteService::find(1);
+        try {
+
             $request->request->add(['amount' => $request->get('amount')]);
             $request->request->add(['account' => $request->get('account')]);
             $request->request->add(['pay_id' => $request->get('pay_id')]);
@@ -433,23 +432,23 @@ class TransmissionController extends Controller
                 $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
                 $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
 
-                $inputs['amount_rial'] =ceil((($dollar->amount_to_rials * $inputs['amount']) / 10000) );
-               $inputs['amount_rial']=floor($inputs['amount_rial']*10000);
+
+                $inputs['amount_rial']=(floor(($dollar->amount_to_rials * $inputs['amount']) / 10000) * 10000);
                 $inputs['amount_rial'] = numberFormat(substr($inputs['amount_rial'], 0, strlen($inputs['amount_rial']) - 1));
 
-                $inputs['Commission'] =ceil(($dollar->amount_to_rials*Doller::Commission)/100);
 
-                $inputs['Commission']=floor(($inputs['Commission']*$inputs['amount'])/10000);
-                $inputs['Commission']=$inputs['Commission']*10000;
+
+                $inputs['Commission']=$dollar->commissionCeil()*$inputs['amount'];
+
                 $inputs['Commission'] = numberFormat(substr($inputs['Commission'], 0, strlen($inputs['Commission']) - 1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
             return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
 
-//        } catch (\Exception $e) {
+        } catch (\Exception $e) {
             return redirect()->route('panel.index')->withErrors(['Error' => 'خطایی رخ داد لطفا از طریق پشتیبانی تیکت ثبت کنید']);
 
-//        }
+        }
 
 
     }
@@ -476,7 +475,6 @@ class TransmissionController extends Controller
             if (isset($inputs['custom_payment'])) {
                 $inputs['service_id_custom'] = $inputs['custom_payment'];
                 $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) / 10000) * 10000);
-
             } else {
                 return redirect()->route('panel.transfer.external', ['account' => $inputs['transmission'], 'amount' => $inputs['custom_payment']
                     , 'pay_id' => $inputs['pay_id'], 'url_back' => $inputs['url_back']])->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
