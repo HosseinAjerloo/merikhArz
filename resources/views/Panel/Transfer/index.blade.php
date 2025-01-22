@@ -38,7 +38,7 @@
                         شماره موبایل خود را وارد کنید
                     </h1>
                 </div>
-                <div class="rounded-md flex items-center justify-center text-black border border-dashed rounded-md">
+                <div class=" flex items-center justify-center text-black border border-black border-dashed p-8 rounded-md">
                     <div class=" flex items-center justify-between text-min space-x-4 space-x-reverse">
                         <input type="text" placeholder="09000000000" class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 mobile">
                         <img src="{{asset('src/images/phone_blue.svg')}}" alt="">
