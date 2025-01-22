@@ -418,7 +418,7 @@ class TransmissionController extends Controller
 
     public function transfer(Request $request)
     {
-        try {
+//        try {
 //            SiteService::where('token', $request->headers->get('token'))->where('is_active', 'active')->first();
 //            $siteService = SiteService::find(1);
             $request->request->add(['amount' => $request->get('amount')]);
@@ -432,21 +432,24 @@ class TransmissionController extends Controller
                 $dollar = Doller::orderBy('id', 'desc')->first();
                 $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
                 $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
-                $inputs['amount_rial'] =floor(($dollar->amount_to_rials * $inputs['amount']) / 10000) * 10000;
+
+                $inputs['amount_rial'] =ceil((($dollar->amount_to_rials * $inputs['amount']) / 10000) );
+               $inputs['amount_rial']=floor($inputs['amount_rial']*10000);
                 $inputs['amount_rial'] = numberFormat(substr($inputs['amount_rial'], 0, strlen($inputs['amount_rial']) - 1));
 
-                $inputs['Commission'] =floor(($dollar->amount_to_rials * Doller::Commission)/100);
-                $inputs['Commission'] =floor(( $inputs['Commission'] / 10000) * 10000);
-                $inputs['Commission']=$inputs['Commission']*$inputs['amount'];
+                $inputs['Commission'] =ceil(($dollar->amount_to_rials*Doller::Commission)/100);
+
+                $inputs['Commission']=floor(($inputs['Commission']*$inputs['amount'])/10000);
+                $inputs['Commission']=$inputs['Commission']*10000;
                 $inputs['Commission'] = numberFormat(substr($inputs['Commission'], 0, strlen($inputs['Commission']) - 1));
                 return view('Panel.Transfer.index', compact('inputs'));
             }
             return view('Panel.Transfer.index', compact('inputs'))->withErrors($validation->errors());
 
-        } catch (\Exception $e) {
+//        } catch (\Exception $e) {
             return redirect()->route('panel.index')->withErrors(['Error' => 'خطایی رخ داد لطفا از طریق پشتیبانی تیکت ثبت کنید']);
 
-        }
+//        }
 
 
     }

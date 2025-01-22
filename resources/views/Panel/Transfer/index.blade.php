@@ -12,7 +12,7 @@
                 </div>
                 <div class="rounded-md  text-black">
                     <div class=" flex items-center justify-center text-min text-center leading-6">
-                        <p>سفارش دریافت <span class="text-rose-700">1 دلار حواله</span> PM از فروشگاه هلوگیت دریافت شد</p>
+                        <p> دریافت <span class="text-rose-700">{{$inputs['amount']??''}} دلار حواله</span> PM از فروشگاه هلوگیت دریافت شد</p>
                     </div>
                 </div>
 
@@ -38,7 +38,7 @@
                         شماره موبایل خود را وارد کنید
                     </h1>
                 </div>
-                <div class="rounded-md flex items-center justify-center text-black ">
+                <div class="rounded-md flex items-center justify-center text-black border border-dashed rounded-md">
                     <div class=" flex items-center justify-between text-min space-x-4 space-x-reverse">
                         <input type="text" placeholder="09000000000" class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 mobile">
                         <img src="{{asset('src/images/phone_blue.svg')}}" alt="">
