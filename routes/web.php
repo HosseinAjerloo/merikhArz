@@ -26,7 +26,7 @@ Route::middleware('guest')->group(function () {
         Route::get("loginBySms", [App\Http\Controllers\Auth\LoginController::class, 'loginBySms'])->name('login-BySms');
     });
     Route::get('forgot-password', [App\Http\Controllers\Auth\LoginController::class, 'forgotPassword'])->name('forgotPassword');
-    Route::get('forgot-password/{otp:token}', [App\Http\Controllers\Auth\LoginController::class, 'forgotPasswordToken'])->name('forgotPassword.token');
+    Route::get('update/password', [App\Http\Controllers\Auth\LoginController::class, 'forgotPasswordUpdate'])->name('forgotPassword.update');
 
 });
 Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');

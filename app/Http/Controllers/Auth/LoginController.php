@@ -108,8 +108,10 @@ class LoginController extends Controller
         $inputs = $registerPasswordRequest->all();
         if (Session::has('user')) {
             $user = User::find(Session::get('user'));
-        } elseif ($registerPasswordRequest->has('mobile')) {
-            $user = User::where('mobile', $inputs['mobile'])->first();
+        } elseif ($registerPasswordRequest->has('code') and Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first()) {
+            $otp=Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first();
+            $otp->update(['seen_at',date('y-m-d H:i:s')]);
+            $user = User::where('mobile', $otp->mobile)->first();
         } else {
             return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
         }
@@ -164,26 +166,23 @@ class LoginController extends Controller
 
     public function forgotPassword(Request $request)
     {
+
+
         if (!Session::has('user'))
             return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
-
         $user = User::find(Session::get('user'));
         $request->merge(['mobile' => $user->mobile]);
-        $message = 'باسلام جهت تغییر کلمه عبور خود روی لینک زیر کلیک کنید' . PHP_EOL;
-        $this->generateCode($request, $message);
-        return redirect()->route('login.simple')->with(['success' => "لطفا از طریق لینک پیامک شده به خط شما تغییر کلمه عبور را انجام دهید"]);
+        $message = 'کدموقت جهت ویرایش کلمه عبور' . PHP_EOL;
+        $otp=$this->generateCode($request, $message);
+
+
+        return redirect()->route('forgotPassword.update')->with(['success' => "کدموقت جهت ویرایش کلمه عبور به موبایل شما ارسال شد"]);
 
     }
 
-    public function forgotPasswordToken(Request $request, Otp $otp)
+    public function forgotPasswordUpdate(Request $request)
     {
-        if (!empty($otp->seen))
-            return redirect()->route('login.simple')->withErrors(['invalidOtp' => 'لینک وارد شده معتبر نمیباشد']);
+        return view('Auth.forgotPassword');
 
-        if (!Session::has('user'))
-            Session::put(['user' => User::where('mobile', $otp->mobile)->first()->id]);
-
-        $otp->update(['seen_at' => date('Y-m-d H:i:s')]);
-        return view('Auth.forgotPassword', compact('otp'));
     }
 }
