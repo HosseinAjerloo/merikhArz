@@ -124,13 +124,7 @@ Route::fallback(function () {
     abort(404);
 });
 
-Route::get('test',function (\Illuminate\Http\Request $request){
 
-    $test=New \App\Services\SmsService\SatiaService();
-    $test->send('satia','09186414452');
-//    $fastPayment=\App\Models\FastPayment::find(1);
-//    return redirect()->route('panel.transfer.external.redirect', $fastPayment);;
-});
 
 
 

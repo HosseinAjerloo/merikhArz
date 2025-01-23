@@ -110,7 +110,7 @@ class LoginController extends Controller
             $user = User::find(Session::get('user'));
         } elseif ($registerPasswordRequest->has('code') and Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first()) {
             $otp=Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first();
-            $otp->update(['seen_at',date('y-m-d H:i:s')]);
+            $otp->update(['seen_at'=>date('y-m-d H:i:s')]);
             $user = User::where('mobile', $otp->mobile)->first();
         } else {
             return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
@@ -173,7 +173,7 @@ class LoginController extends Controller
         $user = User::find(Session::get('user'));
         $request->merge(['mobile' => $user->mobile]);
         $message = 'کدموقت جهت ویرایش کلمه عبور' . PHP_EOL;
-        $otp=$this->generateCode($request, $message);
+        $this->generateCode($request, $message);
 
 
         return redirect()->route('forgotPassword.update')->with(['success' => "کدموقت جهت ویرایش کلمه عبور به موبایل شما ارسال شد"]);
