@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\User\RegisterRequest;
 use App\Http\Requests\Panel\User\UpdateUserRequest;
+use App\Http\Traits\HasFindUser;
+use App\Models\FastPayment;
 use App\Models\User;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    use HasFindUser;
     public function completionOfInformation()
     {
         $user=Auth::user();
@@ -43,5 +46,15 @@ class UserController extends Controller
         $inputs=$request->all();
         $user=$user->update($inputs);
         return $user?redirect()->route('panel.index')->with(['success'=>"اطلاعات کاربری شما با موفقیت ویرایش شد "]):redirect()->route('panel.index')->withErrors(['updateError'=>"اطلاعات کاربری شما با موفقیت ویرایش شد "]);
+    }
+    public function findUser(Request $request)
+    {
+        if ($request->header('token')==env('SAINAEX_TOKEN') and ($request->has('batch_key') or $request->has('order_key')) )
+        {
+                return $this->finderUser($request);
+        }
+        else{
+          return  $this->failMessage();
+        }
     }
 }

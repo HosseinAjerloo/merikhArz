@@ -33,4 +33,8 @@ class Transmission extends Model
             $builder->where('user_id', $user->id)->whereMonth('created_at', $carbon->format('m'));
         }
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }
