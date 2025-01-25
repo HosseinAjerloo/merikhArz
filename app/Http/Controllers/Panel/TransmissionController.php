@@ -653,7 +653,7 @@ class TransmissionController extends Controller
             ]);
 
 
-            $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.";
+            $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.".PHP_EOL."باتشکرسایناارز";
             $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
             return redirect()->route('panel.transfer.external.redirect', $fastPayment);
 

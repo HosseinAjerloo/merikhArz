@@ -172,7 +172,7 @@ class LoginController extends Controller
             return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
         $user = User::find(Session::get('user'));
         $request->merge(['mobile' => $user->mobile]);
-        $message = 'کدموقت جهت ویرایش کلمه عبور' . PHP_EOL;
+        $message = 'کدموقت جهت ویرایش کلمه عبور' .PHP_EOL."باتشکرسایناارز";
         $this->generateCode($request, $message);
 
 

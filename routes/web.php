@@ -124,6 +124,11 @@ Route::fallback(function () {
     abort(404);
 });
 
+Route::get('test',function (){
+    $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.".PHP_EOL."باتشکرسایناارز";
+        dd($message);
+});
+
 
 
 

@@ -9,8 +9,8 @@
     <article class="py-5 px-3 flex flex-col items-center justify-center">
         <div>
             <p class="text-center font-semibold whitespace-pre-line">
-                لطفا کلمه عبور انتخابی خودرا
-                برای رودبه سایناارز وارد کنید.
+                لطفا کلمه عبور خود را وارد کنید یا از گزینه فراموشی کلمه عبور استفاده نمائید
+
             </p>
         </div>
 
