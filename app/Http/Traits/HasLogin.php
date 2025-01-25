@@ -23,7 +23,7 @@ trait HasLogin
         if (!isset($message))
             $message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code. PHP_EOL.'باتشکر سایناارز';
         else
-            $message.=$otp->code;
+            $message.=$otp->code. PHP_EOL.'باتشکر سایناارز';
         $satiaService->send( $message, $inputs['mobile']);
         return $otp;
     }
