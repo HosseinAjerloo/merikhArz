@@ -10,8 +10,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 
-class ReportTheSituationToHologateJob implements ShouldQueue, ShouldBeUnique
+class ReportTheSituationToHologateJob implements ShouldQueue
 {
     use Queueable;
 
@@ -26,17 +27,13 @@ class ReportTheSituationToHologateJob implements ShouldQueue, ShouldBeUnique
         $this->fastPayment = $fastPayment;
     }
 
-    public function uniqueId(): string
-    {
-        return $this->fastPayment->id;
-    }
+
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        Log::emergency('fastPayment :' . $this->fastPayment->id);
 
         try {
             $response = Http::timeout(50)->withHeaders([

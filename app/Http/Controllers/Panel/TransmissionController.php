@@ -653,7 +653,7 @@ class TransmissionController extends Controller
                 'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
             ]);
 
-            \App\Jobs\ReportTheSituationToHologateJob::dispatch($fastPayment)->delay(now()->addMinutes(1))->onQueue(' HologateReport');
+            \App\Jobs\ReportTheSituationToHologateJob::dispatch($fastPayment)->onQueue('HologateReport')->delay(now()->addMinutes(1));
 
             $message = "با سلام پرداخت شما با شماره سفارش {$fastPayment->pay_id} باموفقیت انجام شد  باتشکر".PHP_EOL.'ساینا ارز';
             $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
