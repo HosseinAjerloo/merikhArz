@@ -655,7 +655,7 @@ class TransmissionController extends Controller
 
             \App\Jobs\ReportTheSituationToHologateJob::dispatch($fastPayment)->delay(now()->addMinutes(1))->onQueue(' HologateReport');
 
-            $message = "با سلام پرداخت شما با شماره سفارش {$fastPayment->pay_id} باموفقیت انجام شد و صحت انجام پرداخت به سایت ارجاع دهنده (هلوگیلت) اعلام شد باتشکر".PHP_EOL.'ساینا ارز';
+            $message = "با سلام پرداخت شما با شماره سفارش {$fastPayment->pay_id} باموفقیت انجام شد  باتشکر".PHP_EOL.'ساینا ارز';
             $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
             return redirect()->route('panel.transfer.external.redirect', $fastPayment);
 
