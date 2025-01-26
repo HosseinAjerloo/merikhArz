@@ -575,7 +575,7 @@ class TransmissionController extends Controller
             $inputs = $request->all();
             $payment = Payment::find(session()->get('payment'));
             $financeTransaction = FinanceTransaction::find(session()->get('financeTransaction'));
-            $fastPayment = FinanceTransaction::find(session()->get('fastPayment'));
+            $fastPayment = FastPayment::find(session()->get('fastPayment'));
 
             $bank = $payment->bank;
             $objBank = new $bank->class;
