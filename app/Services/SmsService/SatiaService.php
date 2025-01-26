@@ -56,6 +56,7 @@ class SatiaService
             if (strpos($request->body(), 'ارسال با موفقیت')) {
                 $this->status = true;
             }
+            return $this->status;
         } catch (\Exception $e) {
             Log::emergency($e->getMessage());
         }

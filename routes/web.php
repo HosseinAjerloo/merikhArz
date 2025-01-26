@@ -1,11 +1,13 @@
 <?php
 
 
+use App\Jobs\SendAppAlertsJob;
 use App\Models\Payment;
 use App\Models\Role;
 use App\Models\Transmission;
 use App\Models\VouchersBank;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 use Illuminate\Http\Client\Response;
@@ -125,8 +127,7 @@ Route::fallback(function () {
 });
 
 Route::get('test',function (){
-    $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.".PHP_EOL."باتشکرسایناارز";
-        dd($message);
+
 });
 
 

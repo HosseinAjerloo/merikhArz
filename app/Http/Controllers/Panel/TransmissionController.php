@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Purchase\PurchaseRequest;
 use App\Http\Requests\Panel\Transmission\TransferRequest;
 use App\Http\Requests\Panel\Transmission\TransmissionRequest;
+use App\Http\Traits\HasApi;
 use App\Http\Traits\HasConfig;
 use App\Jobs\SendAppAlertsJob;
 use App\Models\Bank;
@@ -31,7 +32,7 @@ use function Termwind\ask;
 
 class TransmissionController extends Controller
 {
-    use HasConfig;
+    use HasConfig,HasApi;
 
     protected $inputsConfig;
 
@@ -652,8 +653,9 @@ class TransmissionController extends Controller
                 'time_price_of_dollars' => $dollar->DollarRateWithAddedValue(),
             ]);
 
+            \App\Jobs\ReportTheSituationToHologateJob::dispatch($fastPayment)->delay(now()->addMinutes(1))->onQueue(' HologateReport');
 
-            $message = "سلام پرداخت شما انجام اطلاعات بیشتر در قسمت سوابق قابل دسترس می باشد.".PHP_EOL."باتشکرسایناارز";
+            $message = "با سلام پرداخت شما با شماره سفارش {$fastPayment->pay_id} باموفقیت انجام شد و صحت انجام پرداخت به سایت ارجاع دهنده (هلوگیلت) اعلام شد باتشکر".PHP_EOL.'ساینا ارز';
             $satiaService->send($message, $user->mobile, env('SMS_Number'), env('SMS_Username'), env('SMS_Password'));
             return redirect()->route('panel.transfer.external.redirect', $fastPayment);
 
@@ -672,7 +674,7 @@ class TransmissionController extends Controller
 
     public function VerifyFastPayment(Request $request)
     {
-        if ($request->header('token')==env('SAINAEX_TOKEN') and $request->has('pay_id'))
+        if ($this->validationToken($request) and $request->has('pay_id'))
         {
             $fastPayment=FastPayment::where('pay_id',$request->pay_id)->latest()->first();
            if ($fastPayment)
@@ -683,15 +685,15 @@ class TransmissionController extends Controller
                    return response()->json(['success'=>$success,'message'=>$fastPayment->financeTransaction->description,'amount'=>$fastPayment->amount]);
                }
                else{
-                   return response()->json(['success'=>false,'message'=>'پرداخت یافت نشد']);
+                   return $this->failMessage('پرداخت یافت نشد');
                }
            }
            else{
-               return response()->json(['success'=>false,'message'=>'رکورد یافت نشد']);
+               return $this->failMessage();
            }
         }
         else{
-            return response()->json(['success'=>false,'message'=>'رکورد یافت نشد']);
+            return $this->failMessage();
         }
     }
 
