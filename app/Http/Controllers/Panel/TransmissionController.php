@@ -674,26 +674,30 @@ class TransmissionController extends Controller
 
     public function VerifyFastPayment(Request $request)
     {
-        if ($this->validationToken($request) and $request->has('pay_id'))
-        {
-            $fastPayment=FastPayment::where('pay_id',$request->pay_id)->latest()->first();
-           if ($fastPayment)
-           {
-               if ($fastPayment->financeTransaction->payment)
-               {
-                   $success=($fastPayment->financeTransaction->payment->state)!='finished'?false:true;
-                   return response()->json(['success'=>$success,'message'=>$fastPayment->financeTransaction->description,'amount'=>$fastPayment->amount]);
-               }
-               else{
-                   return $this->failMessage('پرداخت یافت نشد');
-               }
-           }
-           else{
-               return $this->failMessage();
-           }
-        }
-        else{
-            return $this->failMessage();
+        try {
+            if ($this->validationToken($request) and $request->has('pay_id'))
+            {
+                $fastPayment=FastPayment::where('pay_id',$request->pay_id)->latest()->first();
+                if ($fastPayment)
+                {
+                    if ($fastPayment->financeTransaction->payment)
+                    {
+                        $success=($fastPayment->financeTransaction->payment->state)!='finished'?false:true;
+                        return response()->json(['success'=>$success,'message'=>$fastPayment->financeTransaction->description,'amount'=>$fastPayment->amount]);
+                    }
+                    else{
+                        return $this->failMessage('پرداخت یافت نشد');
+                    }
+                }
+                else{
+                    return $this->failMessage();
+                }
+            }
+            else{
+                return $this->failMessage();
+            }
+        }catch (\Exception $e){
+            Log::emergency($e->getMessage());
         }
     }
 
