@@ -696,8 +696,8 @@ class TransmissionController extends Controller
             else{
                 return $this->failMessage();
             }
-        }catch (\Exception $e){
-            Log::emergency($e->getMessage());
+        }catch (\Exception $exception){
+            Log::emergency(PHP_EOL.'fastPayment'.PHP_EOL.$exception->getMessage().PHP_EOL);
         }
     }
 
