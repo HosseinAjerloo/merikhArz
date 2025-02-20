@@ -126,12 +126,10 @@ Route::fallback(function () {
     abort(404);
 });
 
-//Route::get('test',function (){
-//    $fastPayment=\App\Models\FastPayment::find(96);
-//    \App\Jobs\ReportTheSituationToHologateJob::dispatch($fastPayment)->onQueue('HologateReport')->delay(now()->addMinutes(1));
-//    dd($fastPayment);
-//
-//});
+Route::get('test',function (){
+
+Log::emergency('hossein');
+})->name('test');
 
 
 
