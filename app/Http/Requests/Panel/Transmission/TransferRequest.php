@@ -25,7 +25,7 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "custom_payment"=>['required','numeric',"max:".env('Daily_Purchase_Limit'),'min:0.1',new DecimalRule()],
+            "custom_payment"=>['required','numeric',"max:".env('Safe_Daily_Purchase_Limit',60),'min:0.1',new DecimalRule()],
             "transmission"=>["required","max:9","min:9",new PAYERACCOUNTRule()],
             "url_back"=>'required',
             "pay_id"=>'required',

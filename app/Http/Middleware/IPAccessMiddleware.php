@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\IP;
 use App\Services\IPAccess\IPService;
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,12 +20,13 @@ class IPAccessMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (session('ip_access_last_check') < Carbon::now()->subHours()) {
+            $ip_is_iran = IPService::check_ip($request->ip());
 
-        $ip_is_iran = IPService::check_ip($request->ip());
-
-        if($ip_is_iran)
-             return $next($request);
-
-        return response()->view('errors.IPAccess');
+            session(['ip_access_last_check'=>Carbon::now()]);
+            if (!$ip_is_iran)
+                return response()->view('errors.IPAccess');
+        }
+        return $next($request);
     }
 }

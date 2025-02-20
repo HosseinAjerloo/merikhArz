@@ -137,7 +137,7 @@ trait HasConfig
     {
         return Validator::make(request()->all(),
             [
-                'amount' => ['required', 'numeric', "max:" . env('Daily_Purchase_Limit'), 'min:0.1', new DecimalRule()],
+                'amount' => ['required', 'numeric', "max:" . env('Safe_Daily_Purchase_Limit',60), 'min:0.1', new DecimalRule()],
                 'account' => ["required", "min:9", "max:9", new PAYERACCOUNTRule()],
                 'pay_id' => ["required"],
                 'url_back' => ["required"],

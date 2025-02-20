@@ -1,4 +1,28 @@
 @extends('Panel.layout.master')
+@section('header-tag')
+    <style>
+        #vpn_alert {
+            animation: blink-animation 1s infinite;
+            -webkit-animation: blink-animation 1s  infinite;
+        }
+        @keyframes blink-animation {
+            from{
+                opacity: 0.5;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @-webkit-keyframes blink-animation {
+            from{
+                opacity: 0.5;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+@endsection
 @section('container')
     <section class="w-full flex items-center justify-center">
         <div class="w-full sm:w-4/5 md:w-3/5 lg:w-1/2 xl:w-1/3 flex items-center flex-col justify-center  p-8 rounded-lg space-y-8 bg-F5F5F5">
@@ -35,10 +59,11 @@
                 <div class="  border-black border absolute -right-[6px] -top-[15px] flex space-x-4 space-x-reverse bg-white py-1.5 px-3 text-black text-min rounded-2xl">
                     <span class="text-sm -right-[12px] -top-[5px] bg-sky-900 w-9 h-9 flex items-center justify-center rounded-[50%] absolute text-white font-bold">2</span>
                     <h1 class="font-bold">
-                        شماره موبایل خود را وارد کنید
+                        شماره موبایل
                     </h1>
                 </div>
-                <div class=" flex items-center justify-center text-black border border-black border-dashed p-8 rounded-md">
+                <p class="text-black text-xs p-2">شماره موبایل خود را برای پیگیری سفارش وارد نمایید</p>
+                <div class=" flex items-center justify-center text-black border border-black border-dashed p-2 rounded-md">
                     <div class=" flex items-center justify-between text-min space-x-4 space-x-reverse">
                         <input type="text" placeholder="09000000000" class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 mobile">
                         <img src="{{asset('src/images/phone_blue.svg')}}" alt="">
@@ -52,9 +77,9 @@
                         پرداخت کنید
                     </h1>
                 </div>
+                <p id="vpn_alert" class="text-red-600 text-center m-2">حتما VPN خود را خاموش کنید</p>
                 <div class="rounded-md  w-full flex items-center justify-center  text-black">
                     <div class=" flex w-full items-center justify-between text-min space-x-4 space-x-reverse">
-
                             <form action="{{route('panel.transfer.external.post')}}" method="post" class="flex items-center justify-between space-x-reverse space-x-2 w-full">
                                 @csrf
                                 <input type="hidden" name="transmission" value="{{$inputs['account']??''}}">
@@ -62,7 +87,7 @@
                                 <input type="hidden" name="pay_id" value="{{$inputs['pay_id']??''}}">
                                 <input type="hidden" name="url_back" value="{{$inputs['url_back']??''}}">
                                 <input type="hidden" id="mobile" name="mobile" >
-                                <button class="px-2 py-1.5 bg-sky-600 text-white p-4 rounded-md text-center w-full submit">ادامه
+                                <button class="px-2 py-1.5 bg-sky-600 text-white p-4 rounded-md text-center w-full submit">پرداخت از درگاه بانکی
                                 </button>
                                 <a href="{{$inputs['url_back']??'#'}}" class="px-2 py-1.5 bg-rose-600 text-white p-4 rounded-md text-center w-full">
                                     انصراف
