@@ -22,7 +22,6 @@ class IPAccessMiddleware
     {
         if (session('ip_access_last_check') < Carbon::now()->subHours()) {
             $ip_is_iran = IPService::check_ip($request->ip());
-
             session(['ip_access_last_check'=>Carbon::now()]);
             if (!$ip_is_iran)
                 return response()->view('errors.IPAccess');
