@@ -14,7 +14,7 @@ class PAYERACCOUNTRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-       if ($value[0]!="U")
+       if (strtoupper($value[0])!="U")
            $fail('آدرس حساب مقصد اشتباه است');
     }
 }

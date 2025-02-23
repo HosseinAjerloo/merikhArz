@@ -8,12 +8,14 @@ use App\Http\Requests\Panel\Transmission\TransferRequest;
 use App\Http\Requests\Panel\Transmission\TransmissionRequest;
 use App\Http\Traits\HasApi;
 use App\Http\Traits\HasConfig;
+use App\Http\Traits\HasLogin;
 use App\Jobs\SendAppAlertsJob;
 use App\Models\Bank;
 use App\Models\Doller;
 use App\Models\FastPayment;
 use App\Models\FinanceTransaction;
 use App\Models\Invoice;
+use App\Models\Otp;
 use App\Models\Payment;
 use App\Models\Service;
 use App\Models\SiteService;
@@ -25,6 +27,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use function Laravel\Prompts\error;
@@ -32,7 +35,7 @@ use function Termwind\ask;
 
 class TransmissionController extends Controller
 {
-    use HasConfig,HasApi;
+    use HasConfig,HasApi,HasLogin;
 
     protected $inputsConfig;
 
@@ -176,6 +179,8 @@ class TransmissionController extends Controller
     public function transferFromThePaymentGateway(TransmissionRequest $request)
     {
         try {
+            $transfer_type = $request->transfer_type == 'fast_payment' ? 'voucher-transfer' : 'panel.transmission.view' ;
+            $transfer_parameter_back = $request->transfer_type == 'fast_payment' ? ['account'=>$request->transmission,'amount'=>$request->custom_payment] : [] ;
             $balance = Auth::user()->getCreaditBalance();
 
             $dollar = Doller::orderBy('id', 'desc')->first();
@@ -194,7 +199,7 @@ class TransmissionController extends Controller
                 $voucherPrice = (floor(($dollar->DollarRateWithAddedValue() * $inputs['custom_payment']) / 10000) * 10000);
 
             } else {
-                return redirect()->route('panel.transmission.view')->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
+                return redirect()->route($transfer_type,$transfer_parameter_back)->withErrors(['SelectInvalid' => "انتخاب شما معتبر نمیباشد"]);
             }
 
             $inputs['final_amount'] = $voucherPrice;
@@ -238,7 +243,7 @@ class TransmissionController extends Controller
                 $invoice->update(['status' => 'failed', 'description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش انتقال حواله پرفکت مانی  شما لغو شد "]);
                 $financeTransaction->update(['description' => "به دلیل عدم ارتباط با بانک $bank->name سفارش شما لغو شد ", 'status' => 'fail']);
 
-                return redirect()->route('panel.transmission.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+                return redirect()->route($transfer_type,$transfer_parameter_back)->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
             }
             $token = $status;
             session()->put('transmission', $inputs['transmission']);
@@ -261,7 +266,7 @@ class TransmissionController extends Controller
             Log::emergency(PHP_EOL . $e->getMessage() . PHP_EOL);
             SendAppAlertsJob::dispatch('در ارتباط با درگاه پرداخت برای انتقال ووچر خطایی رخ داده است لطفا پیگیری کنید')->onQueue('perfectmoney');
 
-            return redirect()->route('panel.transmission.view')->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
+            return redirect()->route($transfer_type,$transfer_parameter_back)->withErrors(['error' => 'ارتباط با بانک فراهم نشد لطفا چند دقیقه بعد تلاش فرماید.']);
         }
     }
 
@@ -417,6 +422,121 @@ class TransmissionController extends Controller
 
     }
 
+    public function voucher_transfer(Request $request)
+    {
+        try {
+            $validation = $this->voucherTransferValidation();
+            $inputs = $request->all();
+            $bank = Bank::where('is_active',1)->first();
+            if (!$validation->fails()) {
+                session()->put('voucher_transfer', $request->getUri());
+                $dollar = Doller::orderBy('id', 'desc')->first();
+                $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
+                $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
+
+                $inputs['amount_rial']=(floor(($dollar->amount_to_rials * $inputs['amount']) / 10000) * 10000);
+                $inputs['amount_rial'] = numberFormat(substr($inputs['amount_rial'], 0, strlen($inputs['amount_rial']) - 1));
+
+                $inputs['Commission']=$dollar->commissionCeil()*$inputs['amount'];
+                $inputs['Commission'] = numberFormat(substr($inputs['Commission'], 0, strlen($inputs['Commission']) - 1));
+                return view('Panel.VoucherTransfer.index', compact('inputs','bank'));
+            }
+            return view('Panel.VoucherTransfer.index', compact('inputs','bank'))->withErrors($validation->errors());
+
+        } catch (\Exception $e) {
+            return redirect()->route('panel.index')->withErrors(['Error' => 'خطایی رخ داد لطفا از طریق پشتیبانی تیکت ثبت کنید']);
+
+        }
+    }
+    public function mobile_submit(Request $request)
+    {
+        $validation = Validator::make($request->all(),
+            [
+                'mobile' => ['required', 'size:11','regex:/09\d{9}/'],
+            ],
+            [
+                'mobile.required' => 'وارد کردن شماره موبایل الزامی است',
+                'mobile.size'=>'شماره موبایل باید 11 رقم باشد',
+                'mobile'=>'سماره موبایل بدرستی وارد نشده است!'
+            ]
+        );
+        if ($validation->fails())
+            return response()->json([
+                'success'=>false,
+                'message' => $validation->errors()->first()
+            ]);
+
+        $otp = $this->generateCode($request);
+        if(!isset($otp->token))
+            return response()->json([
+                'success'=>false,
+                'message' => 'ارسال پیامک ناموفق لطفا به پشتیبانی اطلاع دهید'
+            ]);
+
+        return response()->json([
+            'success'=>true,
+            'token'=> $otp->token,
+            'message' => 'پیامک رمز ورود ارسال گردید'
+        ]);
+    }
+    public function verification_code_submit(Request $request){
+        $validation = Validator::make($request->all(),
+            [
+                'token' => ['required'],
+                'code' => ['required', 'size:5']
+            ],
+            [
+                'token.required' => 'وارد کردن توکن الزامی است',
+                'code.required'=>'وارد کردن کد پیامک شده الزامی است',
+                'code.sie'=>'کد وارد شده باید 5 رقم باشد!'
+            ]
+        );
+        if ($validation->fails())
+            return response()->json([
+                'success'=>false,
+                'message' => $validation->errors()->first()
+            ]);
+
+        $otp = Otp::where('token', $request->token)->latest()->first();
+        if(!$otp)
+            return response()->json([
+                'success'=>false,
+                'message' => 'توکن نا معتبر'
+            ]);
+        if($otp->created_at < Carbon::now()->subMinutes(2))
+            return response()->json([
+                'success'=>false,
+                'message' => 'اعتبار کد به پایان رسیده، لطفا کد جدید دریافت نمایید'
+            ]);
+        if($otp->code != $request->code)
+            return response()->json([
+                'success'=>false,
+                'message' => 'کد وارد شده صحیح نمی باشد!'
+            ]);
+
+
+        $user = User::firstOrCreate(['mobile' => $otp->mobile], [
+            'mobile' => $otp->mobile
+        ]);
+
+        $otp->update(['seen_at' => date('Y/m/d H:i:s', time())]);
+
+        Auth::loginUsingId($user->id);
+
+        return response()->json([
+            'success'=>true,
+            'message' => 'کد وارد شده صحیح است!'
+        ]);
+    }
+    public function transfer_logout(Request $request)
+    {
+        if (Auth::check())
+            Auth::logout();
+        return response()->json([
+            'success'=>true,
+            'message' => 'خروج با موفقیت انجام شد'
+        ]);
+    }
     public function transfer(Request $request)
     {
         try {
@@ -433,11 +553,8 @@ class TransmissionController extends Controller
                 $inputs['rial'] =(floor(($dollar->DollarRateWithAddedValue() * $inputs['amount']) / 10000) * 10000);
                 $inputs['rial'] = numberFormat(substr($inputs['rial'], 0, strlen($inputs['rial']) - 1));
 
-
                 $inputs['amount_rial']=(floor(($dollar->amount_to_rials * $inputs['amount']) / 10000) * 10000);
                 $inputs['amount_rial'] = numberFormat(substr($inputs['amount_rial'], 0, strlen($inputs['amount_rial']) - 1));
-
-
 
                 $inputs['Commission']=$dollar->commissionCeil()*$inputs['amount'];
 

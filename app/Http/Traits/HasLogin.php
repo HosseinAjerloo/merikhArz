@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 trait HasLogin
 {
-    protected function generateCode(Request $request,$message=null)
+    protected function generateCode(Request $request, $message = null)
     {
         $satiaService = new SatiaService();
         $inputs = $request->all();
@@ -21,10 +21,10 @@ trait HasLogin
         $inputs['token'] = $token;
         $otp = Otp::create($inputs);
         if (!isset($message))
-            $message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code. PHP_EOL.'باتشکر سایناارز';
+            $message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code . PHP_EOL . 'باتشکر سایناارز';
         else
-            $message.=$otp->code. PHP_EOL.'باتشکر سایناارز';
-        $satiaService->send( $message, $inputs['mobile']);
+            $message .= $otp->code . PHP_EOL . 'باتشکر سایناارز';
+        $satiaService->send($message, $inputs['mobile']);
         return $otp;
     }
 
@@ -51,8 +51,7 @@ trait HasLogin
     protected function hasUser(Request $request)
     {
         $user = User::where('mobile', $request->mobile)?->first();
-        if(!$user)
-        {
+        if (!$user) {
             $user = User::firstOrCreate(['mobile' => $request->mobile], [
                 'mobile' => $request->mobile
             ]);
@@ -66,7 +65,6 @@ trait HasLogin
         $user = $this->user;
         return $user->password ? true : false;
     }
-
 
 
 }

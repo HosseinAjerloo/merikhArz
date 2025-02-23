@@ -155,6 +155,24 @@ trait HasConfig
             ]
         );
     }
+    protected function voucherTransferValidation()
+    {
+        return Validator::make(request()->all(),
+            [
+                'amount' => ['required', 'numeric', "max:" . env('Safe_Daily_Purchase_Limit',60), 'min:0.1', new DecimalRule()],
+                'account' => ["required", "min:9", "max:9", new PAYERACCOUNTRule()],
+            ],
+            [
+                'amount.required' => 'وارد کردن مبلغ حواله الزامی است',
+                'amount.numeric' => 'مبلغ حواله باید به صورت عددی باشد',
+                'amount.max' => 'مبلغ حواله نباید بزرگ تر از 20 باشد',
+                'amount.min' => 'مبلغ حواله نباید کوچک  تر از 1 باشد',
+                'account.required' => 'وارد کردن شماره حساب حواله الزامی است',
+                'account.max' => 'حداکثر طول شماره حساب حواله باید 9 کاراکتر باشد',
+                'account.min' => 'حداقل طول شماره حساب حواله باید 9 کاراکتر باشد',
+            ]
+        );
+    }
 
     protected function customVoucherTransfer($amount)
     {

@@ -96,6 +96,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('payment-service-register',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register'])->name('panel.payment-service-register');
     Route::post('payment-service-register-submit',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register_submit'])->name('panel.payment-service-register-submit');
 });
+
+Route::get('voucher-transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'voucher_transfer'])->name('voucher-transfer');
+Route::post('mobile-submit', [App\Http\Controllers\Panel\TransmissionController::class, 'mobile_submit'])->name('transfer.mobile-submit');
+Route::post('verification-code-submit', [App\Http\Controllers\Panel\TransmissionController::class, 'verification_code_submit'])->name('transfer.verification-code-submit');
+Route::post('transfer-logout', [App\Http\Controllers\Panel\TransmissionController::class, 'transfer_logout'])->name('transfer.logout');
 Route::get('transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'transfer'])->name('panel.transfer.external');
 Route::post('transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'transferConnectionBank'])->name('panel.transfer.external.post');
 
