@@ -1,6 +1,14 @@
 @extends('Panel.layout.master')
 @section('header-tag')
     <style>
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
         button:disabled {
             background-color: #6398b4;
         }
@@ -89,19 +97,21 @@
                                         class="p-2 bg-sky-600 text-white rounded-md text-center w-full text-nowrap">
                                     ثبت شماره
                                 </button>
-                                <input dir="ltr" id="mobile_number" type="text" placeholder="09000000000"
-                                       class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md p-2 w-full mobile">
+                                <input dir="ltr" id="mobile_number" type="number" placeholder="09000000000" maxlength="11"
+                                       oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                       class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md p-2 w-full mobile only_number">
                                 <img src="{{asset('src/images/phone_blue.svg')}}" alt="">
                             </div>
                         </div>
                     </div>
                     <div id="verification_input" class="hidden">
-                        <p class="text-black text-xs p-2">کد پیامک شده را وارد نمایید</p>
+                        <p class="text-black text-xs p-2">کد تایید به شماره <span id="mobile_number_text" class="mx-2 text-rose-700"></span>ارسال شد.</p>
                         <div
                             class="flex items-center justify-center text-black border border-black border-dashed p-2 rounded-md">
                             <div class="flex items-center justify-between text-min space-x-4 space-x-reverse">
-                                <input dir="ltr" id="verification_code" type="text" placeholder="کد تایید"
-                                       autocomplete="off" maxlength="5" size="5"
+                                <input dir="ltr" id="verification_code" type="number" placeholder="کد تایید"
+                                       oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                       autocomplete="off" maxlength="5"
                                        class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 w-full mobile">
                                 <button type="button" id="change_mobile"
                                         class="p-2 bg-sky-600 text-white rounded-md text-center w-full text-nowrap">
@@ -198,6 +208,7 @@
                         mobile_error.html(response.message);
                     else {
                         verification_token = response.token;
+                        $('#mobile_number_text').html(mobile);
                         $('#mobile_input').fadeOut(500);
                         setTimeout(function () {
                             $('#verification_input').fadeIn(500);
