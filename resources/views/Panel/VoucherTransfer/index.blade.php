@@ -128,7 +128,6 @@
                         <form action="{{route('panel.transferFromThePaymentGateway')}}" method="post"
                               class="flex items-center justify-between space-x-reverse space-x-2 w-full">
                             @csrf
-                            <input id="verification_token" type="hidden" name="verification_token" value="">
                             <input type="hidden" name="transfer_type" value="fast_payment">
                             <input type="hidden" name="bank" value="{{$bank->id}}">
                             <input type="hidden" name="transmission" value="{{$inputs['account']??''}}">
@@ -155,6 +154,7 @@
 @section('script-tag')
 
     <script>
+        var verification_token = '';
         const is_login = '{{auth()->check()}}';
         const submit_error = $('.submit-error');
         submit_error.empty();
@@ -171,6 +171,7 @@
             $('#verification_input').fadeOut(500);
             setTimeout(function () {
                 $('#mobile_input').fadeIn(500);
+                $('#mobile_number').focus();
             }, 500);
         });
 
@@ -196,10 +197,11 @@
                     if (response.success == false)
                         mobile_error.html(response.message);
                     else {
-                        $('#verification_token').val(response.token);
+                        verification_token = response.token;
                         $('#mobile_input').fadeOut(500);
                         setTimeout(function () {
                             $('#verification_input').fadeIn(500);
+                            $('#verification_code').focus().val('');
                         }, 500);
                     }
                 },
@@ -214,12 +216,11 @@
             const verify_code = $(this).val();
             if (verify_code.length != 5)
                 return;
-            const token = $('#verification_token').val();
             const mobile_error = $('#mobile_error')
             mobile_error.empty();
             verification_code_element.prop('disabled', true);
             const data_ = {
-                "token": token,
+                "token": verification_token,
                 'code': verify_code
             }
             $.ajax({
@@ -256,19 +257,19 @@
 
         @if(auth()->check() && auth()->user()?->id == 1177)
         if ('OTPCredential' in window) {
-            window.addEventListener('DOMContentLoaded', e => {
-                const ac = new AbortController();
-                navigator.credentials.get({
-                    otp: {transport: ['sms']},
-                    signal: ac.signal
-                }).then(otp => {
-                    alert(otp.code)
-                }).catch(err => {
-                    alert(err)
-                });
-            })
-        } else {
-            alert('WebOTP not supported!.')
+            window.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    const content = await navigator.credentials.get({
+                        otp: { transport: ['sms'] }
+                    });
+                    if (content && content.code) {
+                        //$('#otpInput').val(content.code);
+                        console.log(content.code);
+                    }
+                } catch (err) {
+                    console.error('Error reading OTP:', err);
+                }
+            });
         }
         @endif
     </script>
