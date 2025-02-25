@@ -207,6 +207,7 @@
                     if (response.success == false)
                         mobile_error.html(response.message);
                     else {
+                        auto_read_otp();
                         verification_token = response.token;
                         $('#mobile_number_text').html(mobile);
                         $('#mobile_input').fadeOut(500);
@@ -266,23 +267,22 @@
             });
         });
 
-        @if(auth()->check() && auth()->user()?->id == 1177)
-        if ('OTPCredential' in window) {
-            window.addEventListener('DOMContentLoaded', async () => {
-                try {
-                    const content = await navigator.credentials.get({
-                        otp: { transport: ['sms'] }
-                    });
-                    if (content && content.code) {
-                        //$('#otpInput').val(content.code);
-                        alert(content.code);
+        function auto_read_otp() {
+            if ('OTPCredential' in window) {
+                window.addEventListener('DOMContentLoaded', async () => {
+                    try {
+                        const content = await navigator.credentials.get({
+                            otp: {transport: ['sms']}
+                        });
+                        if (content && content.code) {
+                            $('#verification_code').val(content.code);
+                        }
+                    } catch (err) {
+                        console.error('Error reading OTP:', err);
                     }
-                } catch (err) {
-                    alert('Error reading OTP:'+ err);
-                }
-            });
+                });
+            }
         }
-        @endif
     </script>
 @endsection
 
