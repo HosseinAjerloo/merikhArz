@@ -6,9 +6,11 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
         input[type="number"] {
             -moz-appearance: textfield;
         }
+
         button:disabled {
             background-color: #6398b4;
         }
@@ -97,7 +99,8 @@
                                         class="p-2 bg-sky-600 text-white rounded-md text-center w-full text-nowrap">
                                     ثبت شماره
                                 </button>
-                                <input dir="ltr" id="mobile_number" type="number" placeholder="09000000000" maxlength="11"
+                                <input dir="ltr" id="mobile_number" type="number" placeholder="09000000000"
+                                       maxlength="11"
                                        oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                        class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md p-2 w-full mobile only_number">
                                 <img src="{{asset('src/images/phone_blue.svg')}}" alt="">
@@ -105,7 +108,9 @@
                         </div>
                     </div>
                     <div id="verification_input" class="hidden">
-                        <p class="text-black text-xs p-2">کد تایید به شماره <span id="mobile_number_text" class="mx-2 text-rose-700"></span>ارسال شد.</p>
+                        <p class="text-black text-xs p-2">کد تایید به شماره <span id="mobile_number_text"
+                                                                                  class="mx-2 text-rose-700"></span>ارسال
+                            شد.</p>
                         <div
                             class="flex items-center justify-center text-black border border-black border-dashed p-2 rounded-md">
                             <div class="flex items-center justify-between text-min space-x-4 space-x-reverse">
@@ -207,7 +212,6 @@
                     if (response.success == false)
                         mobile_error.html(response.message);
                     else {
-                        auto_read_otp();
                         verification_token = response.token;
                         $('#mobile_number_text').html(mobile);
                         $('#mobile_input').fadeOut(500);
@@ -267,21 +271,20 @@
             });
         });
 
-        function auto_read_otp() {
-            if ('OTPCredential' in window) {
-                window.addEventListener('DOMContentLoaded', async () => {
-                    try {
-                        const content = await navigator.credentials.get({
-                            otp: {transport: ['sms']}
-                        });
-                        if (content && content.code) {
-                            $('#verification_code').val(content.code);
-                        }
-                    } catch (err) {
-                        console.error('Error reading OTP:', err);
+
+        if ('OTPCredential' in window) {//auto read otp
+            window.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    const content = await navigator.credentials.get({
+                        otp: {transport: ['sms']}
+                    });
+                    if (content && content.code) {
+                        $('#verification_code').val(content.code);
                     }
-                });
-            }
+                } catch (err) {
+                    console.error('Error reading OTP:', err);
+                }
+            });
         }
     </script>
 @endsection
