@@ -21,7 +21,9 @@ trait HasLogin
         $inputs['token'] = $token;
         $otp = Otp::create($inputs);
         if (!isset($message))
-            $message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code . PHP_EOL . 'باتشکر سایناارز';
+            $message = 'کد ورود به ساینا ارز : '.$code.PHP_EOL.
+                '@sainaex.ir #'.$code;
+            /*$message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code . PHP_EOL . 'باتشکر سایناارز';*/
         else
             $message .= $otp->code . PHP_EOL . 'باتشکر سایناارز';
         $satiaService->send($message, $inputs['mobile']);
