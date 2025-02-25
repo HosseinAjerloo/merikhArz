@@ -275,10 +275,10 @@
                     });
                     if (content && content.code) {
                         //$('#otpInput').val(content.code);
-                        console.log(content.code);
+                        alert(content.code);
                     }
                 } catch (err) {
-                    console.error('Error reading OTP:', err);
+                    alert('Error reading OTP:', err);
                 }
             });
         }
