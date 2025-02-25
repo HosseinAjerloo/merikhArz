@@ -278,7 +278,7 @@
                         alert(content.code);
                     }
                 } catch (err) {
-                    alert('Error reading OTP:', err);
+                    alert('Error reading OTP:'+ err);
                 }
             });
         }
