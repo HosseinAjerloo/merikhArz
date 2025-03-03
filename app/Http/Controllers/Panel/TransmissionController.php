@@ -466,6 +466,22 @@ class TransmissionController extends Controller
                 'message' => $validation->errors()->first()
             ]);
 
+        if ($request->input('verify_User'))
+        {
+            $user = User::firstOrCreate([
+                'mobile' => $request->input('mobile')
+            ], [
+
+            ]);
+            Auth::loginUsingId($user->id);
+            return response()->json([
+                'success'=>true,
+                'message' => 'کاربر با موفقیت وارد شد'
+            ]);
+        }
+
+
+
         $otp = $this->generateCode($request);
         if(!isset($otp->token))
             return response()->json([

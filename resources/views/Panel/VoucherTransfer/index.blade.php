@@ -107,24 +107,26 @@
                             </div>
                         </div>
                     </div>
-                    <div id="verification_input" class="hidden">
-                        <p class="text-black text-xs p-2">کد تایید به شماره <span id="mobile_number_text"
-                                                                                  class="mx-2 text-rose-700"></span>ارسال
-                            شد.</p>
-                        <div
-                            class="flex items-center justify-center text-black border border-black border-dashed p-2 rounded-md">
-                            <div class="flex items-center justify-between text-min space-x-4 space-x-reverse">
-                                <input dir="ltr" id="verification_code" type="number" placeholder="کد تایید"
-                                       oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                       autocomplete="off" maxlength="5"
-                                       class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 w-full mobile">
-                                <button type="button" id="change_mobile"
-                                        class="p-2 bg-sky-600 text-white rounded-md text-center w-full text-nowrap">
-                                    تغییر شماره
-                                </button>
+                    @if(isset($inputs['amount']) and $inputs['amount']>env('Daily_Purchase_Limit'))
+                        <div id="verification_input" class="hidden">
+                            <p class="text-black text-xs p-2">کد تایید به شماره <span id="mobile_number_text"
+                                                                                      class="mx-2 text-rose-700"></span>ارسال
+                                شد.</p>
+                            <div
+                                class="flex items-center justify-center text-black border border-black border-dashed p-2 rounded-md">
+                                <div class="flex items-center justify-between text-min space-x-4 space-x-reverse">
+                                    <input dir="ltr" id="verification_code" type="number" placeholder="کد تایید"
+                                           oninput="if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                           autocomplete="off" maxlength="5"
+                                           class="text-center placeholder:text-center placeholder:text-gray-300 outline-none rounded-md py-2 px-4 w-full mobile">
+                                    <button type="button" id="change_mobile"
+                                            class="p-2 bg-sky-600 text-white rounded-md text-center w-full text-nowrap">
+                                        تغییر شماره
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                     <p id="mobile_error" class="m-2 text-red-600 text-center"></p>
                 @endif
             </div>
@@ -200,8 +202,12 @@
                 return;
             }
             const data_ = {
-                "mobile": mobile
+                "mobile": mobile,
+                @if(isset($inputs['amount']) and $inputs['amount']<env('Daily_Purchase_Limit'))
+                'verify_User':true
+                @endif
             }
+
             submit_mobile_element.prop('disabled', true);
             $.ajax({
                 type: "post",
@@ -212,13 +218,20 @@
                     if (response.success == false)
                         mobile_error.html(response.message);
                     else {
-                        verification_token = response.token;
-                        $('#mobile_number_text').html(mobile);
-                        $('#mobile_input').fadeOut(500);
-                        setTimeout(function () {
-                            $('#verification_input').fadeIn(500);
-                            $('#verification_code').focus().val('');
-                        }, 500);
+                        if ('verify_User' in data_)
+                        {
+                            window.location.reload();
+                        }
+                        else {
+                            verification_token = response.token;
+                            $('#mobile_number_text').html(mobile);
+                            $('#mobile_input').fadeOut(500);
+                            setTimeout(function () {
+                                $('#verification_input').fadeIn(500);
+                                $('#verification_code').focus().val('');
+                            }, 500);
+                        }
+
                     }
                 },
                 complete: function () {

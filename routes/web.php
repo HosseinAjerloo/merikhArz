@@ -131,10 +131,7 @@ Route::fallback(function () {
     abort(404);
 });
 
-Route::get('test',function (){
 
-Log::emergency('hossein');
-})->name('test');
 
 
 
