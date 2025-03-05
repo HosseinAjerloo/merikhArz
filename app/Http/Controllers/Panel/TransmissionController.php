@@ -603,6 +603,7 @@ class TransmissionController extends Controller
             $inputs = $request->all();
             $bank = Bank::where('is_active', 1)->first();
             dd($bank);
+
             $inputs['user_id'] = $user->id;
             $inputs['description'] = " انتقال ووچر از طریق $bank->name";
 
