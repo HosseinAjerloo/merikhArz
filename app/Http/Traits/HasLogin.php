@@ -23,6 +23,7 @@ trait HasLogin
         if (!isset($message))
             $message = $code.' کد ورود به ساینا ارز'.PHP_EOL.
                 '@sainaex.ir #'.$code;
+
             /*$message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code . PHP_EOL . 'باتشکر سایناارز';*/
         else
             $message .= $otp->code . PHP_EOL . 'باتشکر سایناارز';
