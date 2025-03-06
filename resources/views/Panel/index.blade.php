@@ -92,23 +92,3 @@
 
 @endsection
 
-@section('script-tag')
-
-    <script>
-        window.addEventListener('beforeunload', function (e) {
-
-            e.preventDefault();
-            e.returnValue = '';
-            console.log('کاربر در حال ترک صفحه است یا مرورگر را می‌بندد.');
-        });
-
-        window.addEventListener('unload', function () {
-            console.log('کاربر صفحه را ترک کرده یا مرورگر را بسته است.');
-        });
-
-        window.addEventListener('unload', function () {
-            // const data = JSON.stringify({ action: 'close_browser', time: new Date() });
-            navigator.sendBeacon("{{route('test')}}");
-        });
-    </script>
-@endsection
