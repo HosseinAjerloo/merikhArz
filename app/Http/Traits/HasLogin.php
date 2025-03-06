@@ -21,7 +21,7 @@ trait HasLogin
         $inputs['token'] = $token;
         $otp = Otp::create($inputs);
         if (!isset($message))
-            $message = 'کد ورود به ساینا ارز : '.$code.PHP_EOL.
+            $message = $code.' کد ورود به ساینا ارز'.PHP_EOL.
                 '@sainaex.ir #'.$code;
             /*$message = 'به ساینا ارز خوش آمدین کد شما جهت ورود:' . $code . PHP_EOL . 'باتشکر سایناارز';*/
         else
