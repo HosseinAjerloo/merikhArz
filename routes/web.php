@@ -131,6 +131,11 @@ Route::fallback(function () {
     abort(404);
 });
 
+Route::get('test',function (){
+    \App\Jobs\UpdateApiSuccessStatusJob::dispatch();
+
+});
+
 
 
 

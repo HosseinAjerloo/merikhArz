@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('account')->nullable();
             $table->string('pay_id')->nullable();
             $table->string('url_back')->nullable();
+            $table->enum('api_success',['true','false'])->default('false');
             $table->timestamps();
             $table->softDeletes();
         });

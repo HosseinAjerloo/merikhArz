@@ -36,7 +36,7 @@ class ReportTheSituationToHologateJob implements ShouldQueue
     {
 
         try {
-            $response = Http::timeout(50)->withHeaders([
+            $response = Http::timeout(70)->withHeaders([
                 'token' => env('SAINAEX_TOKEN')
             ])->withoutVerifying()->post(env('SAINAEX_REQUEST_REPORT_PAYMENT'),
                 [
@@ -45,10 +45,15 @@ class ReportTheSituationToHologateJob implements ShouldQueue
                     'amount' => $this->fastPayment->amount,
                     'phone_number' => $this->fastPayment->financeTransaction->user->mobile
                 ]);
+            if ($response->status()==200 and $response->successful())
+            {
+                $this->fastPayment->api_success='true';
+                $this->fastPayment->save();
+            }
 
         } catch (\Exception $exception) {
             Log::emergency('con not connection to request host ' . env('SAINAEX_REQUEST_REPORT_PAYMENT') . ' ' . $exception->getMessage());
-            SendAppAlertsJob::dispatch('خطا در برقراری ارتباط داخلی سرور')->onQueue('perfectmoney');
+            SendAppAlertsJob::dispatch('خطا در ارتباط با مقصد وجود آمد لطفا شبکه راچک کنید')->onQueue('perfectmoney');
         }
     }
 }
