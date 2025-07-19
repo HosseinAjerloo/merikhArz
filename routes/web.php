@@ -2,6 +2,7 @@
 
 
 use App\Jobs\SendAppAlertsJob;
+use App\Models\FastPayment;
 use App\Models\Payment;
 use App\Models\Role;
 use App\Models\Transmission;
@@ -93,8 +94,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('download/{file}', [App\Http\Controllers\Panel\TicketController::class, 'download'])->name('panel.ticket.download');
     Route::get('faq', [App\Http\Controllers\Panel\FaqController::class, 'index'])->name('panel.faq');
 
-    Route::get('payment-service-register',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register'])->name('panel.payment-service-register');
-    Route::post('payment-service-register-submit',[\App\Http\Controllers\Panel\PaymentServiceController::class,'payment_service_register_submit'])->name('panel.payment-service-register-submit');
+    Route::get('payment-service-register', [\App\Http\Controllers\Panel\PaymentServiceController::class, 'payment_service_register'])->name('panel.payment-service-register');
+    Route::post('payment-service-register-submit', [\App\Http\Controllers\Panel\PaymentServiceController::class, 'payment_service_register_submit'])->name('panel.payment-service-register-submit');
 });
 
 Route::get('voucher-transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'voucher_transfer'])->name('voucher-transfer');
@@ -129,6 +130,40 @@ Route::view('payment-service', 'Pages.payment-service')->name('payment-service')
 
 Route::fallback(function () {
     abort(404);
+});
+
+Route::get('test', function () {
+    try {
+
+
+        $fastPayments = FastPayment::where('api_success', 'false')->get();
+
+        foreach ($fastPayments as $fastPayment) {
+            $response = Http::timeout(50)->withHeaders([
+                'token' => env('SAINAEX_TOKEN')
+            ])->withoutVerifying()->post(env('SAINAEX_REQUEST_REPORT_PAYMENT'),
+                [
+                    'success' => ($fastPayment->financeTransaction->payment->state) != 'finished' ? false : true,
+                    'invoice_id' => $fastPayment->pay_id,
+                    'amount' => $fastPayment->amount,
+                    'phone_number' => $fastPayment->financeTransaction->user->mobile
+                ]);
+            dump( [
+                'success' => ($fastPayment->financeTransaction->payment->state) != 'finished' ? false : true,
+                'invoice_id' => $fastPayment->pay_id,
+                'amount' => $fastPayment->amount,
+                'phone_number' => $fastPayment->financeTransaction->user->mobile
+            ]);
+            if ($response->status() == 200 and $response->successful()) {
+                $fastPayment->api_success = 'true';
+                $fastPayment->save();
+            }
+
+        }
+    } catch (\Exception $exception) {
+        Log::emergency('con not connection to request host ' . env('SAINAEX_REQUEST_REPORT_PAYMENT') . ' ' . $exception->getMessage());
+        SendAppAlertsJob::dispatch('خطا در ارتباط با مقصد وجود آمد لطفا شبکه راچک کنید')->onQueue('perfectmoney');
+    }
 });
 
 
