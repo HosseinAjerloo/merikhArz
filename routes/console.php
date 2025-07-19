@@ -11,5 +11,5 @@ use \App\Jobs\transmissionsBankArrangementJob;
 \Illuminate\Support\Facades\Schedule::command('queue:work --stop-when-empty');
 \Illuminate\Support\Facades\Schedule::command('queue:work --stop-when-empty --queue perfectmoney')->everyFiveMinutes();
 \Illuminate\Support\Facades\Schedule::job(new UpdateApiSuccessStatusJob)->everyFiveMinutes();
-\Illuminate\Support\Facades\Schedule::command('queue:work --stop-when-empty --queue UpdateApiSuccess')->everySecond();
+\Illuminate\Support\Facades\Schedule::command('queue:work --stop-when-empty --queue UpdateApiSuccess')->everyFiveMinutes();
 \Illuminate\Support\Facades\Schedule::command('queue:work --stop-when-empty --queue HologateReport')->everyMinute();
