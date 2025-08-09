@@ -54,11 +54,11 @@
         })
     </script>
     <script>
-        // $(document).ready(function () {
-        //     $(".bank").click(function () {
-        //         $("#form").submit();
-        //
-        //     });
-        // });
+        $(document).ready(function () {
+            $(".bank").click(function () {
+                $("#form").submit();
+
+            });
+        });
     </script>
 @endsection
