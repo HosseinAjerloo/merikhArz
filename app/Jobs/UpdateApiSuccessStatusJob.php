@@ -38,6 +38,8 @@ class UpdateApiSuccessStatusJob implements ShouldQueue, ShouldBeUnique
                         'amount' => $fastPayment->amount,
                         'phone_number' => $fastPayment->financeTransaction->user->mobile
                     ]);
+
+
                 if ($response->status() == 200 and $response->successful()) {
                     $fastPayment->api_success = 'true';
                     $fastPayment->save();
