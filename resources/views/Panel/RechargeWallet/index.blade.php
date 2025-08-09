@@ -41,13 +41,24 @@
 
 
 @section('script-tag')
-
     <script>
-        $(document).ready(function () {
-            $(".bank").click(function () {
-                $("#form").submit();
+        const form = document.getElementById('form');
+        const lable = document.querySelector('label');
+        form.addEventListener('keypress', function (e) {
 
-            });
-        });
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                lable.click();
+                form.submit();
+            }
+        })
+    </script>
+    <script>
+        // $(document).ready(function () {
+        //     $(".bank").click(function () {
+        //         $("#form").submit();
+        //
+        //     });
+        // });
     </script>
 @endsection
