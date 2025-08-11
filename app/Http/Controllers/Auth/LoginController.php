@@ -105,18 +105,29 @@ class LoginController extends Controller
 
     public function registerPassword(RegisterPasswordRequest $registerPasswordRequest)
     {
-        $inputs = $registerPasswordRequest->all();
-        if (Session::has('user')) {
-            $user = User::find(Session::get('user'));
-        } elseif ($registerPasswordRequest->has('code') and Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first()) {
-            $otp=Otp::where('code',$registerPasswordRequest->code)->where('seen_at',null)->first();
-            $otp->update(['seen_at'=>date('y-m-d H:i:s')]);
-            $user = User::where('mobile', $otp->mobile)->first();
-        } else {
-            return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
-        }
 
-        $password = password_hash($inputs['password'], PASSWORD_DEFAULT);
+        $inputs = $registerPasswordRequest->all();
+
+        if (Session::has('user') and !isset( $registerPasswordRequest->code)) {
+            $user = User::find(Session::get('user'));
+            return $this->setPasswordUser($user, $inputs['password']);
+
+        }
+        if ($registerPasswordRequest->has('code') and Otp::where('code', $registerPasswordRequest->code)->where('seen_at', null)->first()) {
+            $otp = Otp::where('code', $registerPasswordRequest->code)->where('seen_at', null)->first();
+            $otp->update(['seen_at' => date('y-m-d H:i:s')]);
+            $user = User::where('mobile', $otp->mobile)->first();
+            return $this->setPasswordUser($user, $inputs['password']);
+
+        }
+        return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
+
+
+    }
+
+    public function setPasswordUser($user, $password)
+    {
+        $password = password_hash($password, PASSWORD_DEFAULT);
         $result = $user->update(['password' => $password]);
         return $result ? redirect()->route('login.simple')->with(['success' => 'کلمه عبور شما تنظیم شد لطفا برای ورود باکلمه عبور خود اقدام فرمایید']) : redirect()->route('login.index')->withErrors(['failChangePassword' => 'عملیات تنظیم کلمه عبور باشکست مواجه شد لطفا چمد دقیقه دیگه تلاش کنید.']);
     }
@@ -172,7 +183,7 @@ class LoginController extends Controller
             return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
         $user = User::find(Session::get('user'));
         $request->merge(['mobile' => $user->mobile]);
-        $message = 'کدموقت جهت ویرایش کلمه عبور' ;
+        $message = 'کدموقت جهت ویرایش کلمه عبور';
         $this->generateCode($request, $message);
 
 

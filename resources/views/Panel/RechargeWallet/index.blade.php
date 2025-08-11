@@ -55,7 +55,9 @@
     </script>
     <script>
         $(document).ready(function () {
-            $(".bank").click(function () {
+
+            $(".bank").click(function (e) {
+                event.preventDefault();
                 $("#form").submit();
 
             });
