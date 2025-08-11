@@ -121,8 +121,6 @@ class LoginController extends Controller
 
         }
         return redirect()->route('login.index')->withErrors(['ErrorLogin' => 'اطلاعات وارد شده اشتباه است لطفا اطلاعات را دقیق تر وارد کنید!']);
-
-
     }
 
     public function setPasswordUser($user, $password)
