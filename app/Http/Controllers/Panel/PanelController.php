@@ -352,7 +352,7 @@ class PanelController extends Controller
 
             $back_price = $objBank->verify($payment->amount);
 
-            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+            if ($back_price !== true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
                 $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price)]);
                 $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price), 'status' => 'fail']);
 
@@ -634,7 +634,7 @@ class PanelController extends Controller
 
             $back_price = $objBank->verify($payment->amount);
 
-            if ($back_price !==true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
+            if ($back_price !== true or Payment::where("order_id", $inputs['ResNum'])->count() > 1) {
                 $invoice->update(['status' => 'failed', 'description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price)]);
                 $financeTransaction->update(['description' => ' پرداخت موفقیت آمیز نبود ' . $objBank->verifyTransaction($back_price), 'status' => 'fail']);
 

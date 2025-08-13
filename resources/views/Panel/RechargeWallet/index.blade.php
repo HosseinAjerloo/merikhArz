@@ -31,8 +31,9 @@
                    class=" flex items-center justify-start  max-w-max   rounded-md  cursor-pointer bank">
                 <img src="{{asset($bank->logo_url)}}" alt="" class="w-12 h-12 bg-sky-500 rounded-md">
                 <span class="bg-sky-500 py-1.5 px-2 rounded-se-md rounded-ee-md"> {{$bank->name}} </span>
-                <input type="radio" name="bank_id" id="bank-{{$bank->id}}" class="hidden bank" value="{{$bank->id}}">
+                <input type="radio" name="bank_id" id="bank-{{$bank->id}}" class="bank hidden" value="{{$bank->id}}">
             </label>
+
         @endforeach
     </form>
 
@@ -48,18 +49,23 @@
 
             if (e.keyCode == 13) {
                 e.preventDefault();
-                lable.click();
+                e.stopPropagation();
+                // lable.click();
+                const id=lable.getAttribute('for');
+                const input=document.getElementById(id);
+                input.setAttribute('checked','checked')
                 form.submit();
             }
         })
     </script>
     <script>
         $(document).ready(function () {
-
             $(".bank").click(function (e) {
-                event.preventDefault();
+                e.preventDefault();
+                e.stopPropagation();
+                const id=$(this).attr('for');
+                $(`#${id}`).prop('checked', true);
                 $("#form").submit();
-
             });
         });
     </script>
