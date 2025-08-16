@@ -47,7 +47,6 @@ Route::middleware(['auth'])->group(function () {
         });
     });
     Route::get('contact-us', [App\Http\Controllers\Panel\PanelController::class, 'contactUs'])->name('panel.contactUs');
-//    Route::get('purchase', [App\Http\Controllers\Panel\PanelController::class, 'purchase'])->name('panel.purchase.view');
 
 
     Route::get('transmission', [App\Http\Controllers\Panel\TransmissionController::class, 'index'])->name('panel.transmission.view');
@@ -55,7 +54,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('transmission-fail', [App\Http\Controllers\Panel\TransmissionController::class, 'transmissionFail'])->name('panel.transfer.fail');
 
     Route::middleware('LimitedPurchase')->group(function () {
-//        Route::post('purchase', [App\Http\Controllers\Panel\PanelController::class, 'store'])->name('panel.purchase');
 //        Route::post('Purchase-through-the-bank', [App\Http\Controllers\Panel\PanelController::class, 'PurchaseThroughTheBank'])->name('panel.PurchaseThroughTheBank');
         Route::post('transmission', [App\Http\Controllers\Panel\TransmissionController::class, 'store'])->name('panel.transmission');
         Route::post('voucher-transfer-through-bank', [App\Http\Controllers\Panel\TransmissionController::class, 'transferFromThePaymentGateway'])->name('panel.transferFromThePaymentGateway');
@@ -66,13 +64,10 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('transfer/status/{fastPayment}', [App\Http\Controllers\Panel\TransmissionController::class, 'transferStatus'])->name('panel.transfer.external.redirect');
 
-    Route::post('back/Purchase-through-the-bank', [App\Http\Controllers\Panel\PanelController::class, 'backPurchaseThroughTheBank'])->name('panel.Purchase-through-the-bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
     Route::get('wallet-charging', [App\Http\Controllers\Panel\PanelController::class, 'walletCharging'])->name('panel.wallet.charging');
     Route::get('wallet-charging-Preview', [App\Http\Controllers\Panel\PanelController::class, 'walletChargingPreview'])->name('panel.wallet.charging-Preview');
     Route::post('wallet-charging', [App\Http\Controllers\Panel\PanelController::class, 'walletChargingStore'])->name('panel.wallet.charging.store');
     Route::post('back/wallet-charging', [App\Http\Controllers\Panel\PanelController::class, 'walletChargingBack'])->name('panel.wallet.charging.back')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);;
-    Route::get('delivery-bank/{invoice}/{payment}', [App\Http\Controllers\Panel\PanelController::class, 'deliveryVoucherBankView'])->name('panel.deliveryVoucherBankView');
-    Route::post('delivery-bank/{invoice}/{payment}', [App\Http\Controllers\Panel\PanelController::class, 'deliveryVoucherBank'])->name('panel.deliveryVoucherBank');
     Route::middleware('IsEmptyUserInformation')->group(function () {
         Route::get('orders', [App\Http\Controllers\Panel\OrderController::class, 'index'])->name('panel.order');
         Route::get('order/{financeTransaction}/details', [App\Http\Controllers\Panel\OrderController::class, 'details'])->name('panel.order.details');
@@ -80,12 +75,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('expectation/{invoice}/details', [App\Http\Controllers\Panel\OrderController::class, 'ExpectationDetails'])->name('panel.order.expectation.details');
 
     });
-    Route::get('delivery', [App\Http\Controllers\Panel\PanelController::class, 'delivery'])->name('panel.delivery');
     Route::get('rules', [App\Http\Controllers\Panel\PanelController::class, 'rules'])->name('panel.rules');
 
 
     Route::get('tickets', [App\Http\Controllers\Panel\TicketController::class, 'index'])->name('panel.ticket');
     Route::get('contact-us', [App\Http\Controllers\Panel\PanelController::class, 'contactUs'])->name('panel.contactUs');
+    Route::get('delivery', [App\Http\Controllers\Panel\PanelController::class, 'delivery'])->name('panel.delivery');
 
     Route::get('ticket-chat/{ticket}', [App\Http\Controllers\Panel\TicketController::class, 'ticketChat'])->name('panel.ticket-chat');
     Route::post('ticket-client-message', [App\Http\Controllers\Panel\TicketController::class, 'ticketMessage'])->name('panel.ticket-client-message');
@@ -96,6 +91,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('payment-service-register', [\App\Http\Controllers\Panel\PaymentServiceController::class, 'payment_service_register'])->name('panel.payment-service-register');
     Route::post('payment-service-register-submit', [\App\Http\Controllers\Panel\PaymentServiceController::class, 'payment_service_register_submit'])->name('panel.payment-service-register-submit');
+
+    Route::prefix('utopia')->group(function (){
+       Route::get('',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'index'])->name('utopia.index');
+        Route::post('',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'store'])->name('utopia.store');
+        Route::post('connection-bank',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'connectionBank'])->name('utopia.connection.bank');
+        Route::post('back-bank',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'backBank'])->name('utopia.back.bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+        Route::post('delivery-voucher/{invoice}/{payment}',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'deliveryVoucherBankView'])->name('utopia.deliveryVoucherBankView');
+        Route::post('delivery-bank/{invoice}/{payment}', [App\Http\Controllers\Panel\Utopia\UtopiaController::class, 'deliveryVoucherBank'])->name('utopia.deliveryVoucherBank');
+
+    });
 });
 
 Route::get('voucher-transfer', [App\Http\Controllers\Panel\TransmissionController::class, 'voucher_transfer'])->name('voucher-transfer');
@@ -132,9 +137,6 @@ Route::fallback(function () {
     abort(404);
 });
 
-Route::get('test',function (){
-   dd('adad');
-});
 
 
 

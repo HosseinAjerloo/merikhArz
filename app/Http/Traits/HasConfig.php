@@ -18,17 +18,50 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 
 trait HasConfig
 {
     protected $PMeVoucher = null;
-    protected $redirectTo = 'panel.purchase.view';
+
     protected $message;
 
     protected $purchasePermitStatus = false;
 
 
+    protected function generateVoucherUtopia($amount)
+    {
+        $this->inputsConfig->payment_amount=$amount;
+        $this->inputsConfig->type = 'sainaArz';
+        $token = 'USD-' . rand(1, 9) . Str::random(3) . '-' . Str::random(4) . '-' . Str::random(4) . '-' . Str::random(4) . '-' . Str::random(4);
+        $this->verifay(strtoupper($token));
+    }
+    protected function verifay($token)
+    {
+        $user=Auth::user();
+        $voucher = Voucher::where('code', $token)->first();
+//        $utopia=Utopia::where('utopia_voucher',$token)->first();
+        if ($voucher){
+
+            $this->generateVoucherUtopia($this->inputsConfig->payment_amount);
+        }
+        else{
+
+            $this->inputsConfig->hostValue=[
+                'utopia_voucher' => $token,
+                'validate' => $this->inputsConfig->type,
+                'amount' => $this->inputsConfig->payment_amount,
+                'mobile'=>$user->mobile??null
+            ];
+
+            if (!$this->requestToHost()){
+                return false;
+            }
+            $this->PMeVoucher['VOUCHER_CODE'] = $token;
+        }
+
+    }
     public function validationFiledUser()
     {
         $classOpp = get_class();
@@ -112,7 +145,7 @@ trait HasConfig
         $voucher = $invoice->voucher;
 
         if ($voucher) {
-            $this->message = ['error' => "این سفارش قبلا توسط شما خریداری شده است لطفا جهت مشاهده سفارش از منوی داشبورد به قسمت سفارشات مراجعه فرمایید. "];
+            $this->message = ['error' => "این سفارش قبلا توسط شما خریداری شده است لطفا جهت مشاهده سفارش از منوی داشبورد به قسمت سوابق مراجعه فرمایید. "];
             $this->purchasePermitStatus = true;
             return $this;
         }
@@ -129,7 +162,7 @@ trait HasConfig
 
     protected function redirectFunction()
     {
-        return redirect()->route($this->redirectTo)->withErrors($this->message);
+        return redirect()->route('panel.index')->withErrors($this->message);
     }
 
 
@@ -207,17 +240,9 @@ trait HasConfig
         try {
             $response = Http::timeout(50)->withHeaders([
                 'token' => env('SAINAEX_TOKEN')
-            ])->withoutVerifying()->post(env('SAINAEX_REQUEST'),
-                [
-                    'batch' => $this->inputsConfig->payment_batch_num,
-                    'currency' => 'USD',
-                    'type' => 'sainaex',
-                    'fee' => '0.00',
-                    'payer_account' => env('PAYER_ACCOUNT'),
-                    'payee_account' => env('DESTINATION_REMITTANCE'),
-                    'memo' => "SAINAEX,Received Payment " . $this->inputsConfig->payment_amount . " USD from account  " . env('PAYER_ACCOUNT') . ". Memo: API Payment.",
-                    'amount' => $this->inputsConfig->payment_amount
-                ]);
+            ])->withoutVerifying()->post(env('SAINAEX_REQUEST_Utopia'),
+                $this->inputsConfig->hostValue
+            );
             $body = json_decode($response->body());
             if (isset($body->success) and $body->success)
                 return true;

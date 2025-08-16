@@ -24,47 +24,42 @@
         <div class="flex justify-between items-center   w-full  flex-wrap ">
 
 
-{{--            <a href="{{route('panel.purchase.view')}}"  class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">--}}
-{{--                <div class="border-white border-2 rounded-full p-4 box-border">--}}
-{{--                    <img src="{{asset('src/images/newGift.svg')}}" alt="">--}}
-{{--                </div>--}}
-{{--                <p class="text-sm sm:text-base">کارت هدیه</p>--}}
-{{--            </a>--}}
-{{--            <a href="{{route('panel.transmission.view')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">--}}
-{{--                <div class="border-white border-2 rounded-full p-4 box-border">--}}
-{{--                    <img src="{{asset('src/images/newPm.svg')}}" alt="" >--}}
-{{--                </div>--}}
-{{--                <p class="text-sm sm:text-base">حواله پرفکت مانی</p>--}}
-{{--            </a>--}}
+
+            <a href="{{route('utopia.index')}}" class="flex flex-col items-center justify-center space-y-2 mb-7 w-1/3 sm:w-1/4 md:w-1/6">
+                <div class="border-white border-2 rounded-full p-4 box-border">
+                    <img src="{{asset('src/images/utopia.png')}}" alt="" class="w-14">
+                </div>
+                <p class="text-sm sm:text-base">خریدیوتوپیا</p>
+            </a>
 
             <a href="{{route('panel.order')}}" class="flex flex-col items-center justify-center space-y-2 mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/newTransaction.svg')}}" alt="">
+                    <img src="{{asset('src/images/newTransaction.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base"> سوابق</p>
             </a>
 
             <a href="{{route('panel.wallet.charging')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/newWallet.svg')}}" alt="">
+                    <img src="{{asset('src/images/newWallet.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base">کیف پول</p>
             </a>
             <a href="{{route('panel.contactUs')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/newPhone.svg')}}" alt="">
+                    <img src="{{asset('src/images/newPhone.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base">تماس باما</p>
             </a>
             <a href="{{route('panel.faq')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/newTicket.svg')}}" alt="">
+                    <img src="{{asset('src/images/newTicket.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base">پشتیبانی</p>
             </a>
             <a href="{{route('panel.payment-service-register')}}" class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/dargah.svg')}}" alt="">
+                    <img src="{{asset('src/images/dargah.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base">توسعه دهندگان</p>
             </a>
@@ -72,7 +67,7 @@
 
             <a href="{{route('panel.admin')}}"  class="flex flex-col items-center justify-center space-y-2  mb-7 w-1/3 sm:w-1/4 md:w-1/6">
                 <div class="border-white border-2 rounded-full p-4 box-border">
-                    <img src="{{asset('src/images/newAdmin.svg')}}" alt="">
+                    <img src="{{asset('src/images/newAdmin.svg')}}" alt="" class="w-14">
                 </div>
                 <p class="text-sm sm:text-base">ورود به پنل ادمین</p>
             </a>

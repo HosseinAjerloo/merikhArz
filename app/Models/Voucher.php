@@ -25,5 +25,9 @@ class Voucher extends Model
             return $this->service_id_custom;
         }
     }
+    public function financeTransaction()
+    {
+        return $this->hasOne(FinanceTransaction::class,'voucher_id');
+    }
 
 }

@@ -3,14 +3,15 @@
 @tailwind utilities;
 @font-face {
     font-family: vazir;
-    src: url('../../public/src/fonts/Vazir.woff');
-    src: url('../../public/src/fonts/Vazir.woff2');
+    src: url('../../public/src/fonts/Shabnam.woff');
+    src: url('../../public/src/fonts/Shabnam.woff2');
+
 }
 *{
     font-family: 'vazir';
 }
 body{
-    font-family: 'vazir';
+    /*font-family: 'vazir';*/
     direction: rtl;
 }
 

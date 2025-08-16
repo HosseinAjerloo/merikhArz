@@ -6,6 +6,7 @@
 <main class=" w-full  transition-all duration-700 ">
     @include('Alert.Toast.warning')
     @include('Alert.Toast.success')
+    <div id="errorBox"></div>
     <section class="py-5 px-3 flex justify-center items-center container md:mx-auto">
         @yield('message-box')
 
@@ -22,6 +23,5 @@
 </main>
 @yield('script-tag')
 </body>
-
 @include('Panel.layout.footer')
 
