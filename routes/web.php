@@ -97,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'store'])->name('utopia.store');
         Route::post('connection-bank',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'connectionBank'])->name('utopia.connection.bank');
         Route::post('back-bank',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'backBank'])->name('utopia.back.bank')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
-        Route::post('delivery-voucher/{invoice}/{payment}',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'deliveryVoucherBankView'])->name('utopia.deliveryVoucherBankView');
+        Route::get('delivery-voucher/{invoice}/{payment}',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'deliveryVoucherBankView'])->name('utopia.deliveryVoucherBankView');
         Route::post('delivery-bank/{invoice}/{payment}', [App\Http\Controllers\Panel\Utopia\UtopiaController::class, 'deliveryVoucherBank'])->name('utopia.deliveryVoucherBank');
 
     });

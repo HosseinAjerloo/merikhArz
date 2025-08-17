@@ -48,7 +48,8 @@
                             @endif
                         </div>
                         <div class="text-[11.5px] w-2/12  text-center py-2 font-semibold">
-                            {{strrev(substr(strrev($financeTransaction->creadit_balance),4))!=""?strrev(substr(strrev($financeTransaction->creadit_balance),4)):0}}
+                            {{numberFormat($financeTransaction->creadit_balance / 10)}}
+
                         </div>
                     </div>
                     @if($financeTransaction->voucher)
@@ -64,19 +65,7 @@
                                          class="w-6 h-6 mt-1 copy cursor-pointer transition-all hover:scale-150">
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <p class="text-sm font-semibold sm:text-base">
-                                    شماره ووچر:
-                                </p>
-                                <div class=" relative">
-                                    <div class="flex items-center space-x-3 space-x-reverse">
-                                        <span
-                                            class="text-sm sm:text-base">{{$financeTransaction->voucher->serial}}</span>
-                                        <img src="{{asset('src/images/Group 422.png')}}" alt=""
-                                             class="w-6 h-6 mt-1 copy cursor-pointer transition-all hover:scale-150">
-                                    </div>
 
-                                </div>
                             </div>
                         </div>
                     @endif

@@ -32,9 +32,9 @@
                 class="pb-2 flex justify-between flex-wrap items-center  sm:justify-start sm:space-x-reverse sm:space-x-2 ">
                 @foreach($banks as $bank)
                     <label for="bank-{{$bank->id}}"
-                           class="mt-2 text-[12px] sm:text-[15px] flex w-1/2	 rounded-lg shadow shadow-bluee-900 max-w-max items-center py-3 px-4 space-x-2 space-x-reverse bg-green-500">
+                           class="mt-2 hover:cursor-pointer text-[12px] sm:text-[15px] flex w-1/2	 rounded-lg shadow shadow-bluee-900 max-w-max items-center py-3 px-4 space-x-2 space-x-reverse bg-green-500">
                         {{$bank->name??''}}
-                        <input type="radio" value="saman" class="hidden" name="bank" id="bank-{{$bank->id}}">
+                        <input type="radio" value="{{$bank->id}}" class="hidden" name="bank" id="bank-{{$bank->id}}">
                     </label>
 
                 @endforeach
@@ -71,6 +71,7 @@
             if (element.nodeName == "LABEL" && validation()) {
                 let input = element.querySelector('input');
                 input.setAttribute("checked", "checked");
+                form.setAttribute('action',"{{route('utopia.connection.bank')}}")
                 form.submit()
 
             }
