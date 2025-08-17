@@ -136,3 +136,4 @@ Route::view('payment-service', 'Pages.payment-service')->name('payment-service')
 Route::fallback(function () {
     abort(404);
 });
+
