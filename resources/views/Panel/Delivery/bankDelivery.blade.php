@@ -190,7 +190,7 @@
     <script>
         function redirect()
         {
-            window.location.href="{{route('panel.deliveryVoucherBankView',[$invoice, $payment])}}"
+            window.location.href="{{route('utopia.deliveryVoucherBankView',[$invoice, $payment])}}"
         }
     </script>
 @endsection
