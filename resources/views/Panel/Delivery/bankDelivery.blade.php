@@ -1,4 +1,4 @@
-@extends('Panel.Layout.master')
+@extends('Panel.layout.master')
 @section('header-content')
     <section class="bg-DFEDFF h-14 flex items-center justify-between px-4">
         <div class="flex items-center space-x-reverse space-x-2">
