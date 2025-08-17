@@ -19,7 +19,6 @@
 
 @section('container')
 
-    <i class="fa-solid fa-spinner loading text-green-600"></i>
 
     <article class="py-5 px-3 flex flex-col items-center justify-center space-y-9 relative">
 
