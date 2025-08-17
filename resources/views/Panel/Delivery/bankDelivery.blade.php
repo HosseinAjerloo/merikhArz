@@ -26,6 +26,7 @@
     </section>
 @endsection
 @section('content')
+
     <section class=" container mx-auto w-full md:w-1/2 lg:w-1/3 border-2 border-black/15 rounded-lg mt-4 ">
         <header class="flex items-center justify-center h-10 bg-DFEDFF rounded-lg space-x-2 space-x-reverse p-1.5">
             <img src="{{asset('src/images/checked.svg')}}" alt="" class="w-5 h-5 hidden image-success">
@@ -38,7 +39,7 @@
             <div class="flex items-center ">
                 <p class="w-24 text-mini-base">کد رهگیری :</p>
                 <div class="flex items-center space-x-reverse space-x-2">
-                    <img src="{{asset('src/images/copy.svg')}}" alt="" class="w-4 h-4 copy cursor-pointer">
+                    <img src="{{asset('src/images/copy.svg')}}" alt="" class="w-4 h-4 bg-white copy cursor-pointer">
                     <p class="flex items-center justify-center text-mini-base " id="voucher-code">
 
                     </p>
@@ -68,10 +69,10 @@
 
         </article>
         <div class="flex justify-center items-center py-3 space-x-2 space-x-reverse">
-            <a href="{{route('panel.index')}}" class="bg-gradient-to-b from-DE9408 to-FFB01B flex items-center text-mini-mini-base px-4 py-2.5 text-white rounded-lg">
+            <a href="{{route('panel.index')}}" class="bg-sky-900 flex items-center text-mini-mini-base px-4 py-2.5 text-white rounded-lg">
                 بازگشت به پنل کاربری
             </a>
-            <button disabled onclick="redirect()" class="again cursor-pointer bg-gradient-to-b from-80C714 to-268832 flex items-center text-mini-mini-base px-4 py-2.5 text-white rounded-lg ">
+            <button disabled onclick="redirect()" class="again cursor-pointer bg-sky-900 flex items-center text-mini-mini-base px-4 py-2.5 text-white rounded-lg ">
                 درخواست مجددا
             </button>
         </div>
@@ -80,7 +81,7 @@
 
 
 @endsection
-@section('script')
+@section('script-tag')
 
     <script>
 
@@ -118,7 +119,6 @@
                 data:dataValue,
                 timeout:20000,
                 success: function(response){
-                    console.log(response);
                     if(response.status!='undefined' && response.status)
                     {
                         $("#voucher-status").removeClass('hidden');
@@ -137,7 +137,6 @@
                     }
                 },
                 error: function(error){
-                    console.log('error'+error)
                     $("#message").html('روند ایجاد کارت هدیه یوتوپیا با مشکل روبه رو شد')
                     $(".loading").addClass('text-rouse-500')
                     again();

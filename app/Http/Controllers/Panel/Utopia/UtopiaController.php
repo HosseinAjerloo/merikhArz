@@ -91,7 +91,7 @@ class UtopiaController extends Controller
                         'amount' => $voucherPrice,
                         'type' => "withdrawal",
                         "creadit_balance" => ($balance - $voucherPrice),
-                        'description' => "خرید کارت هدیه {$inputs['custom_payment']} دلاری و کسر مبغ از کیف پول",
+                        'description' => "خرید کارت هدیه یوتوپیا{$inputs['custom_payment']} دلاری و کسر مبغ از کیف پول",
 
                         'time_price_of_dollars' => $dollar->DollarRateWithAddedValue()
                     ]);

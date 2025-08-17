@@ -31,7 +31,7 @@
                         <div class="text-[11.5px] w-2/12 text-center py-2 ">
 
                             <div class="flex items-center justify-center">
-                                <p class="font-semibold text-[11.5px]">{{ strrev(substr(strrev($financeTransaction->amount),4))!=""?strrev(substr(strrev($financeTransaction->amount),4)):0}}</p>
+                                <p class="font-semibold text-[11.5px]">{{numberFormat($financeTransaction->amount / 10)}}</p>
                                 @if($financeTransaction->type=="deposit")
                                     <i class="fa-solid fa-plus text-[11.5px] text-green-400"></i>
 
