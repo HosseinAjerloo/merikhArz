@@ -5,14 +5,19 @@
     <section class="rounded-lg p-2 border-4 border-sky-900/75 bg-sky-900">
         <div class="flex justify-center items-center space-x-3">
             <img src="{{asset('src/images/utopia.png')}}" alt="" class="w-14">
-            <h4 class="font-semibold">ووچر یوتوپیا</h4>
+            <h4 class="font-semibold">حواله یوتوپیا</h4>
         </div>
-        <form id="form" action="{{route('utopia.store')}}" class="space-y-6" method="POST">
+        <form id="form" action="{{route('utopia.transmission.store')}}" class="space-y-6" method="POST">
             @csrf
             <div class="flex items-center  space-x-4 space-x-reverse">
-                <span class="text-md tracking-tight">مبلغ وچر:</span>
+                <span class="text-md tracking-tight w-[160px]">مبلغ وچر:</span>
                 <input name="custom_payment" value="{{old('custom_payment')}}" type="text"
                        class="custom_payment text-black outline-none border-none rounded-md py-1 w-full md:w-1/2 lg:w-1/4 px-2">
+            </div>
+            <div class="flex items-center  space-x-4 space-x-reverse">
+                <span class="text-md tracking-tight w-[160px]">آدرس کیف پول مقصد:</span>
+                <input name="transmission" value="{{old('transmission')}}" type="text"
+                       class="transmission text-black outline-none border-none rounded-md py-1 w-full md:w-1/2 lg:w-1/4 px-2">
             </div>
             <div class="flex items-center space-x-2 space-x-reverse">
                 <img src="{{asset('src/images/dollar.png')}}" class="w-8">
@@ -54,12 +59,21 @@
 
     <script>
         let voucherNumber = document.querySelector('.custom_payment');
+        let transmission = document.querySelector('.transmission');
         let dollerValue = parseInt("{{$doller->DollarRateWithAddedValue()}}");
         let price = 0
         let doted = 0;
         voucherNumber.addEventListener('input', function (e) {
-            if (!validation())
-                return;
+            if (Number(voucherNumber.value) < Number("{{env('Daily_Purchase_Limit')}}")) {
+
+                let valueInput = parseFloat(voucherNumber.value);
+
+                price = dollerValue * valueInput;
+                price = Math.floor((price / 10000)) * 10000;
+                document.querySelector('.live-amount').innerHTML = formatNumber(price) + ' ریال';
+
+
+            }
 
         })
 
@@ -79,7 +93,7 @@
             if (element.nodeName == "LABEL" && validation()) {
                 let input = element.querySelector('input');
                 input.setAttribute("checked", "checked");
-                form.setAttribute('action', "{{route('utopia.connection.bank')}}")
+                form.setAttribute('action', "{{route('utopia.transmission.bank')}}")
                 form.submit()
 
             }
@@ -112,24 +126,21 @@
 
             }
             if (!/^\d+(\.\d{1,2})?$/.test(voucherNumber.value) && !voucherNumber.value.includes('.')) {
-                showError('مقدار ووچر باید عددی باشد')
                 document.querySelector('.live-amount').innerHTML = ''
 
                 voucherNumber.value = '';
                 return false;
 
             }
-            if (Number(voucherNumber.value) < Number("{{env('Daily_Purchase_Limit')}}")) {
-
-                let valueInput = parseFloat(voucherNumber.value);
-
-                price = dollerValue * valueInput;
-                price = Math.floor((price / 10000)) * 10000;
-                document.querySelector('.live-amount').innerHTML = formatNumber(price) + ' ریال';
-                return true;
 
 
+            if (transmission.value==''){
+                console.log('yes')
+                showError('واردکردن آدرس کیف  پول مقصدالزامی میباشد')
+
+                return false;
             }
+
             return true
         }
 

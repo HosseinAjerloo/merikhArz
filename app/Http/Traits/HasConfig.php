@@ -112,15 +112,14 @@ trait HasConfig
         }
     }
 
-    protected function sendReference(TransmissionsBank $transmissionBank): array
+    protected function sendReference(): array
     {
-        $transmissionBank->update(['status'=> 'used']);
         $PMeVoucher = [];
-        $PMeVoucher['PAYMENT_AMOUNT'] = $transmissionBank->payment_amount;
-        $PMeVoucher['PAYMENT_BATCH_NUM'] = $transmissionBank->payment_batch_num;
-        $PMeVoucher['Payer_Account'] = env('PAYER_ACCOUNT');
-        $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE');
-        $PMeVoucher['Payee_Account_Name'] = 'hologate4';
+        $PMeVoucher['PAYMENT_AMOUNT'] = $this->inputsConfig->payment_amount;
+        $PMeVoucher['PAYMENT_BATCH_NUM'] =  $this->inputsConfig->payment_batch_num;
+        $PMeVoucher['Payer_Account'] = env('DESTINATION_REMITTANCE_Utopia');
+        $PMeVoucher['Payee_Account'] = env('DESTINATION_REMITTANCE_Utopia');
+        $PMeVoucher['Payee_Account_Name'] = 'sainaarz';
         return $PMeVoucher;
     }
 
@@ -206,33 +205,55 @@ trait HasConfig
             ]
         );
     }
+    protected function generateTokenTransmissionUtopia()
+    {
+        $token = bin2hex(openssl_random_pseudo_bytes(32));
+        return $this->verifayTokenTransmissionUtopia(strtoupper($token));
+    }
+    protected function verifayTokenTransmissionUtopia($token)
+    {
+        $transmissionUtopia = Transmission::where('payment_batch_num', $token)->first();
+//        $utopia=Utopia::where('hash',$token)->first();
+        if ($transmissionUtopia)
+            $this->generateTokenTransmissionUtopia();
+        else
+            return $token;
+
+    }
 
     protected function customVoucherTransfer($amount)
     {
 
-        $lastRecord = TransmissionsBank::where('type', 'sainaex')->latest()->first();
+        $user=Auth::user();
         $this->inputsConfig->payment_amount = $amount;
+        $this->inputsConfig->payment_batch_num=$this->generateTokenTransmissionUtopia();
         $this->inputsConfig->type = 'sainaex';
-        $randBatch = rand(111, 999);
-        if (!$lastRecord) {
-            $this->inputsConfig->payment_batch_num = TransmissionsBank::StartWith . $randBatch;
-        } else {
-            $payment_batch_num = (TransmissionsBank::StartWith + $lastRecord->id) + 1;
-            $this->inputsConfig->payment_batch_num = $payment_batch_num . $randBatch;
+
+        $this->inputsConfig->hostValue=[
+            'hash' => $this->inputsConfig->payment_batch_num,
+            'validate' => $this->inputsConfig->type,
+            'amount' => $this->inputsConfig->payment_amount,
+            'mobile'=>$user->mobile??null
+
+        ];
+        if (!$this->requestToHost()){
+            return false;
         }
 
-        if ($this->requestToHost()) {
-            return TransmissionsBank::create(
-                [
-                    'payment_amount' => $this->inputsConfig->payment_amount,
-                    'payment_batch_num' => $this->inputsConfig->payment_batch_num,
-                    'status' => 'new',
-                    'description' => 'انتقال ووچر به صورت اتوماتیک',
-                    'type' => $this->inputsConfig->type,
-                ]
-            );
+        return true;
+    }
+    protected function transmissionUtopia($transmission, $amount)
+    {
+        if ($transmission != env('DESTINATION_REMITTANCE_Utopia'))
+            return false;
+
+
+        if ($this->customVoucherTransfer($amount))
+        {
+            return $this->sendReference();
         }
         return false;
+
     }
 
     protected function requestToHost(): bool

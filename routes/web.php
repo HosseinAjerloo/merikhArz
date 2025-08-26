@@ -100,6 +100,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('delivery-voucher/{invoice}/{payment}',[App\Http\Controllers\Panel\Utopia\UtopiaController::class,'deliveryVoucherBankView'])->name('utopia.deliveryVoucherBankView');
         Route::post('delivery-bank/{invoice}/{payment}', [App\Http\Controllers\Panel\Utopia\UtopiaController::class, 'deliveryVoucherBank'])->name('utopia.deliveryVoucherBank');
 
+        Route::prefix('transmission')->group(function (){
+           Route::get('',[App\Http\Controllers\Panel\Utopia\TransmissionUtopiaController::class,'index'])->name('utopia.transmission.index');
+           Route::post('',[App\Http\Controllers\Panel\Utopia\TransmissionUtopiaController::class,'store'])->name('utopia.transmission.store');
+           Route::get('information/{transitionDelivery}',[App\Http\Controllers\Panel\Utopia\TransmissionUtopiaController::class,'information'])->name('utopia.transmission.information');
+           Route::post('/bank',[App\Http\Controllers\Panel\Utopia\TransmissionUtopiaController::class,'transferFromThePaymentGateway'])->name('utopia.transmission.bank');
+           Route::post('/bank/back',[App\Http\Controllers\Panel\Utopia\TransmissionUtopiaController::class,'transferFromThePaymentGatewayBack'])->name('utopia.transmission.bank.back')->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+        });
+
     });
 });
 
